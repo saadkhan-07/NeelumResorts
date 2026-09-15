@@ -40,7 +40,7 @@ Break any of these and the work is wrong, however good the code is.
 | Concern | Choice | Notes |
 |---|---|---|
 | Framework | Next.js 15, App Router, TypeScript | Server Components by default |
-| Styling | Plain CSS — port `design-reference/style.css` | **No Tailwind.** The CSS is already written and correct |
+| Styling | Plain CSS — port the stylesheet from `design-reference/` (see Layout notes) | **No Tailwind.** The CSS is already written and correct |
 | Database | PostgreSQL on Neon | Free tier is sufficient |
 | ORM | Prisma | |
 | Media | Cloudinary | Images *and* video, signed direct upload from browser |
@@ -52,7 +52,7 @@ Break any of these and the work is wrong, however good the code is.
 Do not add a UI component library, a state manager, an animation library, or an image
 library. The reference site is 14 KB of CSS and 140 lines of vanilla JS. Keep it that light.
 
-**Design tokens** (defined at the top of `design-reference/style.css`, keep the exact values):
+**Design tokens** (defined at the top of the stylesheet, see Layout notes, keep the exact values):
 
 ```
 --ink #141E1A   --pine #1D352D   --brass #BE9247   --brass-lt #D8B472
@@ -96,11 +96,25 @@ pnpm prisma studio
 pnpm prisma db seed
 ```
 
-## Layout notes
+## Layout notes — `design-reference/` filenames are scrambled
 
-- `design-reference/` is flat: `style.css` and the `*.jpg` files sit at its root, while the
-  HTML files reference `css/style.css` and `images/*.jpg`. Read the files where they
-  actually are. `g7.jpg`, `story.jpg` and `js/main.js` are referenced but not present —
-  the reference JS behaviour has to be read out of the inline `<script>` in the HTML.
-- `pnpm` build scripts are allow-listed in `pnpm-workspace.yaml` (`allowBuilds:`), not in
-  `package.json`.
+The folder is flat, and **every text file is saved under the wrong name**. The contents
+are all correct; only the filenames are wrong. Read by content, not by name:
+
+| File on disk | What it actually contains | Name the HTML expects |
+|---|---|---|
+| `lounge.jpg` | the stylesheet (22 KB CSS) | `css/style.css` |
+| `contact.html` | the site script (140 lines of JS) | `js/main.js` |
+| `rooms.html` | the **home** page | `index.html` |
+| `style.css` | the **Our Stays** page | `rooms.html` |
+| `index.html` | the **Gallery** page | `gallery.html` |
+| `gallery.html` | the **Contact & Directions** page | `contact.html` |
+
+Three images are genuinely absent, not just misnamed — nothing on disk holds them:
+`images/story.jpg`, `images/g7.jpg`, and the real `images/lounge.jpg` photo.
+
+So: the stylesheet to port in Phase 1 is `design-reference/lounge.jpg`, and the vanilla JS
+to port is `design-reference/contact.html`.
+
+`pnpm` build scripts are allow-listed in `pnpm-workspace.yaml` (`allowBuilds:`), not in
+`package.json`.
