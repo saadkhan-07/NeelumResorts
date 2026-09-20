@@ -558,8 +558,24 @@ render without crashing on an empty database, and Lighthouse mobile performance 
 - Build everything in section 5: the signing route, `lib/cloudinary.ts`, the custom
   `next/image` loader, `<CldImage>` and `<CldVideo>` components.
 - Extend `prisma/seed.ts` to upload `design-reference/images/` to Cloudinary into folders
-  `neelum/rooms/`, `neelum/tours/`, `neelum/gallery/` and `neelum/brand/`, writing a
-  `Media` row for each. Pages then read media through `queries.ts` like everything else.
+  `neelum/rooms/`, `neelum/tours/`, `neelum/gallery/` and `neelum/brand/`. Pages then read
+  media through `queries.ts` like everything else.
+- **Seed only what is correct.** Write a `Media` row only where the photograph genuinely
+  matches its placement. Several files in `design-reference/images/` fill a slot with the
+  wrong subject because there were not enough photographs: `bonfire.jpg` is the resort
+  building, `kahwa.jpg` is a bedroom, `dining.jpg` is the courtyard, and `hero-3.jpg`
+  duplicates `story.jpg`. Do not seed those. The three tours other than Taobat have a jeep
+  photo only — no destination photography exists yet.
+- **Every unseeded section degrades gracefully**, because the client fills these in from
+  the admin panel later and a wrong photo is worse than none:
+  - Hero with fewer than three slides runs with what exists, dots matching the real count;
+    with none, a solid `--pine` background behind the headline.
+  - A room or tour with no photo shows a neutral `--sand` block in the image area — never
+    a broken image, never a collapsed layout.
+  - A gallery with no media does not render the section at all.
+  - A brand slot with no media uses the inline SVG fallback.
+- Print a table of every placement, whether it was seeded, and from which file. That table
+  is the photography request list for the client.
 - Public pages now render media from `Media` rows, rooms and tours alike
   (`placement: ROOM` / `placement: TOUR`).
 - Brand assets per section 5b: `logoUrl` / `faviconUrl` helpers, the `<Logo>` component
@@ -567,8 +583,9 @@ render without crashing on an empty database, and Lighthouse mobile performance 
   and the inline-SVG fallback for every slot.
 
 **Done when:** every image on the site is served from `res.cloudinary.com` with
-`f_auto,q_auto`, the homepage is under 1.2 MB, and a hero video plays on desktop but shows
-only the poster on a 390px viewport.
+`f_auto,q_auto`, the homepage is under 1.2 MB, a hero video plays on desktop but shows
+only the poster on a 390px viewport, and every unseeded section renders cleanly at both
+1440px and 390px.
 
 ### Phase 5 — Auth and admin shell
 - Auth.js with Credentials, bcrypt password hashes, JWT sessions.

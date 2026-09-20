@@ -1,12 +1,18 @@
 import { WhatsAppIcon } from "./icons";
-import { WA_ENQUIRY, waLink } from "@/lib/site";
+import { waGeneral, waLink } from "@/lib/wa";
 
 /** The fixed green bubble, bottom-right on every public page. */
-export function WhatsAppFloat({ message = WA_ENQUIRY }: { message?: string }) {
+export function WhatsAppFloat({
+  whatsapp,
+  message = waGeneral,
+}: {
+  whatsapp: string;
+  message?: string;
+}) {
   return (
     <a
       className="wa-float"
-      href={waLink(message)}
+      href={waLink(whatsapp, message)}
       target="_blank"
       rel="noopener"
       aria-label="Chat on WhatsApp"

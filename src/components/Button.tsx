@@ -1,5 +1,5 @@
 import Link from "next/link";
-import { waLink } from "@/lib/site";
+import { waLink } from "@/lib/wa";
 
 type Variant = "primary" | "dark" | "ghost" | "light" | "wa";
 
@@ -12,6 +12,8 @@ type ButtonProps = {
   href?: string;
   /** A WhatsApp message — renders a wa.me link and ignores `href`. */
   wa?: string;
+  /** Required with `wa`: the number from `Setting["whatsapp"]`. */
+  whatsapp?: string;
   type?: "button" | "submit";
   onClick?: React.MouseEventHandler;
   className?: string;
@@ -30,6 +32,7 @@ export function Button({
   small,
   href,
   wa,
+  whatsapp,
   type = "button",
   onClick,
   className,
@@ -41,7 +44,7 @@ export function Button({
     return (
       <a
         className={cn}
-        href={waLink(wa)}
+        href={waLink(whatsapp ?? "", wa)}
         target="_blank"
         rel="noopener"
         onClick={onClick}

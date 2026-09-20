@@ -1,0 +1,641 @@
+/* =========================================================
+   Neelum Resort Taobat — admin panel
+   This is NOT the marketing design. It shares the brand colours so the owner
+   recognises it, and nothing else: no Cormorant display face, no 128px section
+   padding, no reveal animations. Dense, legible, and built for one thumb on a
+   360px phone with two bars of signal.
+
+   Sections: 1 tokens · 2 shell · 3 nav · 4 content · 5 cards & tables
+             6 forms · 7 login · 8 responsive
+   ========================================================= */
+
+/* ---------- 1. tokens ---------- */
+.admin {
+  --a-ink: #141e1a;
+  --a-pine: #1d352d;
+  --a-brass: #be9247;
+  --a-line: #e2ded6;
+  --a-bg: #f7f5f1;
+  --a-panel: #ffffff;
+  --a-body: #54504a;
+  --a-muted: #8a857d;
+  --a-danger: #b3261e;
+  --a-ok: #1fa855;
+
+  /* One control height everywhere. 44px is the smallest reliable touch target;
+     nothing tappable in this panel is smaller. */
+  --a-tap: 44px;
+  --a-r: 6px;
+  --a-bar: 62px; /* bottom tab bar */
+
+  font-family: var(--font-body), system-ui, -apple-system, "Segoe UI", sans-serif;
+  color: var(--a-ink);
+  background: var(--a-bg);
+  font-size: 15px;
+  line-height: 1.5;
+  font-weight: 400;
+  -webkit-font-smoothing: antialiased;
+  min-height: 100dvh;
+}
+
+.admin *,
+.admin *::before,
+.admin *::after {
+  box-sizing: border-box;
+}
+
+.admin h1,
+.admin h2,
+.admin h3 {
+  font-family: inherit;
+  color: var(--a-ink);
+  margin: 0;
+  line-height: 1.25;
+  letter-spacing: -0.01em;
+}
+.admin h1 { font-size: 1.35rem; font-weight: 600; }
+.admin h2 { font-size: 1.05rem; font-weight: 600; }
+.admin h3 { font-size: 0.95rem; font-weight: 600; }
+.admin p { margin: 0 0 0.8em; }
+.admin p:last-child { margin-bottom: 0; }
+.admin a { color: inherit; text-decoration: none; }
+
+/* ---------- 2. shell ---------- */
+.admin-shell {
+  display: grid;
+  min-height: 100dvh;
+  grid-template-columns: 240px 1fr;
+}
+
+.admin-main {
+  min-width: 0; /* long enquiry text must not widen the grid */
+  padding: 20px 20px 24px;
+}
+
+/* ---------- 3. nav ---------- */
+.admin-side {
+  background: var(--a-pine);
+  color: rgba(255, 255, 255, 0.72);
+  padding: 18px 14px;
+  display: flex;
+  flex-direction: column;
+  gap: 4px;
+  position: sticky;
+  top: 0;
+  height: 100dvh;
+}
+
+.admin-brand {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  padding: 6px 8px 18px;
+  color: #fff;
+}
+.admin-brand svg { width: 26px; height: 26px; flex: none; }
+.admin-brand b { font-size: 0.9rem; font-weight: 600; display: block; line-height: 1.2; }
+.admin-brand span {
+  font-size: 0.62rem;
+  letter-spacing: 0.16em;
+  text-transform: uppercase;
+  opacity: 0.6;
+}
+
+.admin-side a {
+  display: flex;
+  align-items: center;
+  gap: 11px;
+  min-height: var(--a-tap);
+  padding: 0 12px;
+  border-radius: var(--a-r);
+  font-size: 0.9rem;
+  transition: background 0.15s, color 0.15s;
+}
+.admin-side a svg { width: 18px; height: 18px; flex: none; opacity: 0.85; }
+.admin-side a:hover { background: rgba(255, 255, 255, 0.07); color: #fff; }
+.admin-side a.is-active { background: var(--a-brass); color: #fff; font-weight: 500; }
+.admin-side a.is-active svg { opacity: 1; }
+
+.admin-side .admin-count {
+  margin-left: auto;
+  background: var(--a-brass);
+  color: #fff;
+  font-size: 0.7rem;
+  font-weight: 600;
+  min-width: 22px;
+  height: 22px;
+  border-radius: 11px;
+  display: grid;
+  place-items: center;
+  padding: 0 6px;
+}
+.admin-side a.is-active .admin-count { background: rgba(255, 255, 255, 0.28); }
+
+.admin-side-foot {
+  margin-top: auto;
+  padding-top: 14px;
+  border-top: 1px solid rgba(255, 255, 255, 0.12);
+  font-size: 0.78rem;
+}
+.admin-side-foot b { display: block; color: #fff; font-weight: 500; }
+.admin-side-foot span { opacity: 0.6; font-size: 0.72rem; }
+
+/* the mobile bottom bar — hidden on desktop */
+.admin-tabs { display: none; }
+
+/* ---------- 4. content ---------- */
+.admin-head {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+  flex-wrap: wrap;
+  margin-bottom: 18px;
+}
+.admin-head p {
+  width: 100%;
+  margin: 0;
+  color: var(--a-muted);
+  font-size: 0.85rem;
+}
+
+.admin-sub {
+  font-size: 0.68rem;
+  letter-spacing: 0.14em;
+  text-transform: uppercase;
+  color: var(--a-muted);
+  font-weight: 600;
+  margin: 26px 0 10px;
+}
+
+/* ---------- 5. cards, stats, tables ---------- */
+.admin-stats {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(150px, 1fr));
+  gap: 12px;
+}
+.admin-stat {
+  background: var(--a-panel);
+  border: 1px solid var(--a-line);
+  border-radius: var(--a-r);
+  padding: 14px 16px;
+}
+.admin-stat b {
+  display: block;
+  font-size: 1.75rem;
+  font-weight: 600;
+  line-height: 1.1;
+  letter-spacing: -0.02em;
+}
+.admin-stat span {
+  font-size: 0.72rem;
+  letter-spacing: 0.1em;
+  text-transform: uppercase;
+  color: var(--a-muted);
+}
+.admin-stat--alert b { color: var(--a-brass); }
+
+.admin-card {
+  background: var(--a-panel);
+  border: 1px solid var(--a-line);
+  border-radius: var(--a-r);
+  overflow: hidden;
+}
+
+/* An enquiry row. On a phone this is the whole screen's worth of information,
+   so it stacks rather than scrolling sideways — no horizontal scroll, ever. */
+.admin-row {
+  display: block;
+  padding: 13px 15px;
+  border-bottom: 1px solid var(--a-line);
+  min-height: var(--a-tap);
+}
+.admin-row:last-child { border-bottom: 0; }
+.admin-row:hover { background: #fbfaf8; }
+
+.admin-row-top {
+  display: flex;
+  align-items: baseline;
+  gap: 10px;
+}
+.admin-row-top b { font-weight: 600; font-size: 0.94rem; }
+.admin-row-top time {
+  margin-left: auto;
+  color: var(--a-muted);
+  font-size: 0.75rem;
+  white-space: nowrap;
+}
+.admin-row-meta {
+  color: var(--a-body);
+  font-size: 0.82rem;
+  margin-top: 3px;
+  display: flex;
+  flex-wrap: wrap;
+  gap: 4px 10px;
+}
+.admin-row-msg {
+  color: var(--a-muted);
+  font-size: 0.82rem;
+  margin-top: 5px;
+  display: -webkit-box;
+  -webkit-line-clamp: 2;
+  -webkit-box-orient: vertical;
+  overflow: hidden;
+}
+
+.admin-tag {
+  font-size: 0.64rem;
+  letter-spacing: 0.08em;
+  text-transform: uppercase;
+  font-weight: 600;
+  padding: 3px 7px;
+  border-radius: 3px;
+  background: #ece8e0;
+  color: var(--a-body);
+  white-space: nowrap;
+}
+.admin-tag--new { background: var(--a-brass); color: #fff; }
+.admin-tag--tour { background: #dfe9e4; color: var(--a-pine); }
+
+.admin-empty {
+  padding: 26px 16px;
+  text-align: center;
+  color: var(--a-muted);
+  font-size: 0.88rem;
+}
+
+/* ---------- 6. buttons & forms ---------- */
+.admin-btn {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  gap: 8px;
+  min-height: var(--a-tap);
+  padding: 0 18px;
+  border-radius: var(--a-r);
+  border: 1px solid transparent;
+  background: var(--a-brass);
+  color: #fff;
+  font: inherit;
+  font-size: 0.88rem;
+  font-weight: 500;
+  cursor: pointer;
+  transition: background 0.15s, border-color 0.15s;
+}
+.admin-btn svg { width: 17px; height: 17px; flex: none; }
+.admin-btn:hover { background: #a87c34; }
+.admin-btn--ghost {
+  background: transparent;
+  border-color: var(--a-line);
+  color: var(--a-ink);
+}
+.admin-btn--ghost:hover { background: #fff; border-color: var(--a-muted); }
+.admin-btn--block { width: 100%; }
+.admin-btn[disabled] { opacity: 0.55; cursor: not-allowed; }
+
+.admin-field { margin-bottom: 14px; }
+.admin-field label {
+  display: block;
+  font-size: 0.72rem;
+  letter-spacing: 0.1em;
+  text-transform: uppercase;
+  color: var(--a-muted);
+  font-weight: 600;
+  margin-bottom: 6px;
+}
+.admin-field input,
+.admin-field select,
+.admin-field textarea {
+  width: 100%;
+  min-height: var(--a-tap);
+  padding: 10px 13px;
+  border: 1px solid var(--a-line);
+  border-radius: var(--a-r);
+  background: var(--a-panel);
+  font: inherit;
+  /* 16px stops iOS zooming the whole page when the field takes focus. */
+  font-size: 16px;
+  color: var(--a-ink);
+  outline: none;
+  transition: border-color 0.15s;
+}
+.admin-field input:focus,
+.admin-field select:focus,
+.admin-field textarea:focus {
+  border-color: var(--a-brass);
+}
+
+.admin-error {
+  background: #fdecea;
+  border: 1px solid #f3c4c0;
+  color: var(--a-danger);
+  border-radius: var(--a-r);
+  padding: 10px 13px;
+  font-size: 0.85rem;
+  margin-bottom: 14px;
+}
+
+/* Visible focus ring for keyboard users, on every interactive thing. */
+.admin a:focus-visible,
+.admin button:focus-visible,
+.admin input:focus-visible,
+.admin select:focus-visible,
+.admin textarea:focus-visible {
+  outline: 2px solid var(--a-brass);
+  outline-offset: 2px;
+}
+
+/* ---------- 7. login ---------- */
+.admin-login {
+  min-height: 100dvh;
+  display: grid;
+  place-items: center;
+  padding: 24px 18px;
+  background: var(--a-pine);
+}
+.admin-login-card {
+  width: 100%;
+  max-width: 380px;
+  background: var(--a-panel);
+  border-radius: 10px;
+  padding: 26px 22px 24px;
+  box-shadow: 0 20px 50px -22px rgba(0, 0, 0, 0.5);
+}
+.admin-login-card h1 { font-size: 1.2rem; margin-bottom: 4px; }
+.admin-login-card .admin-login-sub {
+  color: var(--a-muted);
+  font-size: 0.85rem;
+  margin-bottom: 20px;
+}
+
+/* ---------- 8. responsive ---------- */
+@media (max-width: 860px) {
+  .admin-shell { grid-template-columns: 1fr; }
+
+  .admin-side { display: none; }
+
+  .admin-main {
+    padding: 14px 14px calc(var(--a-bar) + env(safe-area-inset-bottom, 0px) + 16px);
+  }
+
+  /* The phone header: title left, account right, nothing else. */
+  .admin-topbar {
+    display: flex;
+    align-items: center;
+    gap: 10px;
+    background: var(--a-pine);
+    color: #fff;
+    padding: 10px 14px;
+    padding-top: calc(10px + env(safe-area-inset-top, 0px));
+    position: sticky;
+    top: 0;
+    z-index: 20;
+  }
+  .admin-topbar b { font-size: 0.95rem; font-weight: 600; }
+  .admin-topbar .admin-topbar-right { margin-left: auto; display: flex; gap: 8px; }
+
+  /* Bottom tab bar — thumb reach. Fixed, above the home indicator. */
+  .admin-tabs {
+    display: grid;
+    grid-auto-flow: column;
+    grid-auto-columns: 1fr;
+    position: fixed;
+    left: 0;
+    right: 0;
+    bottom: 0;
+    z-index: 30;
+    background: var(--a-panel);
+    border-top: 1px solid var(--a-line);
+    padding-bottom: env(safe-area-inset-bottom, 0px);
+  }
+  .admin-tabs a {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: center;
+    gap: 3px;
+    height: var(--a-bar);
+    font-size: 0.64rem;
+    letter-spacing: 0.02em;
+    color: var(--a-muted);
+    position: relative;
+  }
+  .admin-tabs a svg { width: 21px; height: 21px; }
+  .admin-tabs a.is-active { color: var(--a-brass); font-weight: 600; }
+  .admin-tabs a.is-active::before {
+    content: "";
+    position: absolute;
+    top: 0;
+    left: 22%;
+    right: 22%;
+    height: 2px;
+    background: var(--a-brass);
+  }
+  .admin-tabs .admin-dot {
+    position: absolute;
+    top: 8px;
+    left: 50%;
+    margin-left: 6px;
+    min-width: 16px;
+    height: 16px;
+    border-radius: 8px;
+    background: var(--a-brass);
+    color: #fff;
+    font-size: 0.6rem;
+    font-weight: 700;
+    display: grid;
+    place-items: center;
+    padding: 0 4px;
+  }
+
+  .admin-stats { grid-template-columns: 1fr 1fr; gap: 10px; }
+  .admin-stat { padding: 12px 13px; }
+  .admin-stat b { font-size: 1.5rem; }
+}
+
+@media (min-width: 861px) {
+  .admin-topbar { display: none; }
+}
+
+/* 360px is the target. Nothing may overflow it. */
+@media (max-width: 380px) {
+  .admin-main { padding-inline: 11px; }
+  .admin-stat b { font-size: 1.35rem; }
+  .admin-tabs a { font-size: 0.6rem; }
+  .admin-row { padding: 12px 12px; }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .admin * { transition: none !important; }
+}
+
+/* =========================================================
+   9. Phase 6 — CRUD screens
+   ========================================================= */
+
+/* filters */
+.admin-filters { display: grid; gap: 8px; margin-bottom: 14px; }
+.admin-filters__row { display: flex; gap: 7px; flex-wrap: wrap; }
+.admin-chip {
+  display: inline-flex; align-items: center; gap: 7px;
+  min-height: 38px; padding: 0 12px;
+  border: 1px solid var(--a-line); border-radius: 100px;
+  background: var(--a-panel); font-size: 0.84rem; white-space: nowrap;
+}
+.admin-chip b { font-weight: 600; font-size: 0.74rem; color: var(--a-muted); }
+.admin-chip.is-on { background: var(--a-pine); border-color: var(--a-pine); color: #fff; }
+.admin-chip.is-on b { color: rgba(255,255,255,0.7); }
+
+/* detail */
+.admin-detail { display: grid; gap: 14px; grid-template-columns: 1fr; }
+.admin-detail__main { padding: 16px; }
+.admin-detail__actions { display: grid; gap: 10px; align-content: start; }
+.admin-detail__message { margin-top: 16px; border-top: 1px solid var(--a-line); padding-top: 14px; }
+.admin-detail__message h2 { font-size: 0.72rem; letter-spacing: 0.12em; text-transform: uppercase; color: var(--a-muted); margin-bottom: 8px; }
+.admin-detail__message p { white-space: pre-wrap; }
+.admin-detail__delete { margin-top: 4px; }
+
+.admin-dl { display: grid; gap: 10px; margin: 0; }
+.admin-dl > div { display: grid; grid-template-columns: 120px 1fr; gap: 10px; align-items: baseline; }
+.admin-dl dt { font-size: 0.72rem; letter-spacing: 0.1em; text-transform: uppercase; color: var(--a-muted); font-weight: 600; }
+.admin-dl dd { margin: 0; font-size: 0.92rem; }
+
+.admin-status { display: grid; gap: 6px; }
+.admin-status label { font-size: 0.72rem; letter-spacing: 0.1em; text-transform: uppercase; color: var(--a-muted); font-weight: 600; }
+.admin-status select {
+  min-height: var(--a-tap); padding: 10px 13px; font: inherit; font-size: 16px;
+  border: 1px solid var(--a-line); border-radius: var(--a-r); background: var(--a-panel);
+}
+
+.admin-btn--wa { background: #1fa855; }
+.admin-btn--wa:hover { background: #17853f; }
+.admin-btn--danger { background: transparent; border-color: #e6c3c0; color: var(--a-danger); }
+.admin-btn--danger:hover { background: #fdecea; border-color: var(--a-danger); }
+.admin-btn--icon { padding: 0; width: 38px; min-height: 38px; }
+
+.admin-toast {
+  margin: 8px 0 0; padding: 9px 12px; border-radius: var(--a-r);
+  background: #e7f4ec; border: 1px solid #b9e0c9; color: #12693a; font-size: 0.85rem;
+}
+.admin-toast--error { background: #fdecea; border-color: #f3c4c0; color: var(--a-danger); }
+
+/* chips input */
+.admin-chips { list-style: none; margin: 0 0 8px; padding: 0; display: flex; flex-wrap: wrap; gap: 6px; }
+.admin-chips li {
+  display: inline-flex; align-items: center; gap: 6px;
+  background: #efece6; border-radius: 100px; padding: 5px 6px 5px 12px; font-size: 0.85rem;
+}
+.admin-chips li button {
+  border: 0; background: rgba(0,0,0,0.07); color: var(--a-ink);
+  width: 24px; height: 24px; border-radius: 50%; cursor: pointer; font-size: 1rem; line-height: 1;
+}
+.admin-chips__empty { background: none; color: var(--a-muted); font-size: 0.82rem; padding-left: 0; }
+.admin-chips__add { display: flex; gap: 8px; }
+.admin-chips__add input {
+  flex: 1; min-height: var(--a-tap); padding: 10px 13px; font: inherit; font-size: 16px;
+  border: 1px solid var(--a-line); border-radius: var(--a-r); background: var(--a-panel);
+}
+
+/* toggle */
+.admin-toggle { display: flex; align-items: center; gap: 12px; padding: 10px 0; cursor: pointer; }
+.admin-toggle input { position: absolute; opacity: 0; width: 0; height: 0; }
+.admin-toggle__track {
+  width: 46px; height: 28px; border-radius: 100px; background: #d9d4cb;
+  position: relative; flex: none; transition: background 0.18s;
+}
+.admin-toggle__dot {
+  position: absolute; top: 3px; left: 3px; width: 22px; height: 22px;
+  border-radius: 50%; background: #fff; transition: transform 0.18s;
+  box-shadow: 0 1px 3px rgba(0,0,0,0.25);
+}
+.admin-toggle input:checked + .admin-toggle__track { background: var(--a-ok); }
+.admin-toggle input:checked + .admin-toggle__track .admin-toggle__dot { transform: translateX(18px); }
+.admin-toggle input:focus-visible + .admin-toggle__track { outline: 2px solid var(--a-brass); outline-offset: 2px; }
+.admin-toggle__text b { display: block; font-weight: 600; font-size: 0.92rem; }
+.admin-toggle__text small { color: var(--a-muted); font-size: 0.78rem; }
+
+/* reorder */
+.admin-reorder { list-style: none; margin: 0; padding: 0; display: grid; gap: 8px; }
+.admin-reorder__item {
+  display: flex; align-items: center; gap: 10px;
+  background: var(--a-panel); border: 1px solid var(--a-line); border-radius: var(--a-r);
+  padding: 8px 10px;
+}
+.admin-reorder__item.is-dragging {
+  border-color: var(--a-brass); box-shadow: 0 6px 18px -8px rgba(0,0,0,0.35);
+}
+.admin-reorder__body { flex: 1; min-width: 0; }
+.admin-reorder__nudge { display: grid; gap: 4px; flex: none; }
+.admin-reorder__status { font-size: 0.78rem; color: var(--a-muted); min-height: 1.2em; margin: 8px 0 0; }
+.admin-grip {
+  flex: none; width: 40px; min-height: var(--a-tap);
+  display: grid; place-items: center;
+  border: 0; background: none; color: var(--a-muted); cursor: grab;
+  /* Without this the browser claims the gesture for scrolling and the drag never starts. */
+  touch-action: none;
+}
+.admin-grip:active { cursor: grabbing; color: var(--a-ink); }
+
+/* uploader */
+.admin-upload { display: grid; gap: 8px; }
+.admin-upload__jobs { list-style: none; margin: 0; padding: 0; display: grid; gap: 6px; }
+.admin-upload__jobs li {
+  display: grid; grid-template-columns: 1fr auto; gap: 4px 8px; align-items: center;
+  font-size: 0.8rem; background: var(--a-panel);
+  border: 1px solid var(--a-line); border-radius: var(--a-r); padding: 8px 10px;
+}
+.admin-upload__jobs li.is-error { border-color: #f3c4c0; background: #fdecea; }
+.admin-upload__name { overflow: hidden; text-overflow: ellipsis; white-space: nowrap; }
+.admin-upload__err { grid-column: 1 / -1; color: var(--a-danger); }
+.admin-upload__bar {
+  grid-column: 1 / -1; height: 5px; border-radius: 3px; background: #e6e2da; overflow: hidden;
+}
+.admin-upload__bar > span { display: block; height: 100%; background: var(--a-brass); transition: width 0.2s; }
+.admin-upload__pct { font-variant-numeric: tabular-nums; color: var(--a-muted); }
+
+/* forms + lists */
+.admin-form { display: grid; gap: 2px; max-width: 720px; }
+.admin-form__row { display: grid; gap: 12px; grid-template-columns: 1fr 1fr; }
+.admin-form__actions {
+  display: flex; gap: 10px; flex-wrap: wrap;
+  margin-top: 16px; padding-top: 16px; border-top: 1px solid var(--a-line);
+}
+.admin-section { margin-top: 22px; }
+.admin-thumb {
+  width: 54px; height: 40px; border-radius: 4px; object-fit: cover;
+  background: var(--a-bg); flex: none;
+}
+.admin-listline { display: flex; align-items: center; gap: 10px; min-width: 0; }
+.admin-listline b { font-weight: 600; font-size: 0.9rem; }
+.admin-listline small { color: var(--a-muted); font-size: 0.76rem; display: block; }
+.admin-listline__text { min-width: 0; }
+
+/* fares */
+.admin-fare {
+  display: grid; gap: 8px; grid-template-columns: 1.2fr 1fr 1fr auto;
+  align-items: end; padding: 10px; border: 1px solid var(--a-line);
+  border-radius: var(--a-r); background: var(--a-panel); margin-bottom: 8px;
+}
+.admin-fare .admin-field { margin-bottom: 0; }
+.admin-fare__note { grid-column: 1 / -1; }
+
+/* brand slots */
+.admin-slots { display: grid; gap: 14px; grid-template-columns: repeat(auto-fit, minmax(260px, 1fr)); }
+.admin-slot { background: var(--a-panel); border: 1px solid var(--a-line); border-radius: var(--a-r); padding: 14px; }
+.admin-slot h2 { font-size: 0.95rem; margin-bottom: 2px; }
+.admin-slot p { color: var(--a-muted); font-size: 0.78rem; margin-bottom: 10px; }
+.admin-slot__previews { display: grid; grid-template-columns: 1fr 1fr; gap: 8px; margin-bottom: 10px; }
+.admin-slot__strip { padding: 14px; border-radius: 4px; display: grid; place-items: center; min-height: 68px; }
+.admin-slot__strip--dark { background: var(--a-pine); }
+.admin-slot__strip--light { background: #fff; border: 1px solid var(--a-line); }
+.admin-slot__strip img { max-height: 40px; max-width: 100%; object-fit: contain; }
+.admin-slot__strip span { font-size: 0.7rem; color: var(--a-muted); }
+.admin-slot__strip--dark span { color: rgba(255,255,255,0.5); }
+
+@media (max-width: 860px) {
+  .admin-form__row { grid-template-columns: 1fr; }
+  .admin-fare { grid-template-columns: 1fr 1fr; }
+  .admin-dl > div { grid-template-columns: 1fr; gap: 2px; }
+}
+@media (min-width: 900px) {
+  .admin-detail { grid-template-columns: 1fr 300px; }
+}

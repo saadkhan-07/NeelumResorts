@@ -1,0 +1,176 @@
+// Neelum Resort Taobat — schema, from PROMPT.md section 4.
+// The model definitions below are that section verbatim; only the generator and
+// datasource blocks are added, since section 4 does not specify them.
+
+generator client {
+  provider = "prisma-client"
+  output   = "../src/generated/prisma"
+}
+
+datasource db {
+  provider = "postgresql"
+}
+
+model Room {
+  id          String   @id @default(cuid())
+  slug        String   @unique
+  name        String
+  tagline     String              // the small tag on the card: "Most booked"
+  shortDesc   String              // card text
+  longDesc    String   @db.Text   // detail page text
+  guests      String              // "2 guests"
+  beds        String              // "1 queen bed"
+  sizeSqft    String?             // "220 sq ft"
+  view        String              // "River-facing"
+  amenities   String[]            // bullet list on the detail page
+  price       Int?                // PKR per night, nullable
+  showPrice   Boolean  @default(false)
+  order       Int      @default(0)
+  published   Boolean  @default(true)
+  photos      Media[]
+  enquiries   Enquiry[]
+  createdAt   DateTime @default(now())
+  updatedAt   DateTime @updatedAt
+}
+
+model Tour {
+  id          String   @id @default(cuid())
+  slug        String   @unique
+  name        String              // "Ratti Gali Lake", "Arang Kel"
+  tagline     String              // card tag: "Most popular", "Full day"
+  shortDesc   String              // card text
+  longDesc    String   @db.Text   // detail page text
+  season      String?             // "Open late June – September"
+  difficulty  String?             // "Jeep track, then a 45-min walk"
+  travelNote  String?             // "About 3 hrs from Kel, a full day from Muzaffarabad"
+  highlights  String[]            // what you see
+  includes    String[]            // driver, fuel, waiting time…
+  showPrice   Boolean  @default(false)  // master switch for this tour's published fares
+  order       Int      @default(0)
+  published   Boolean  @default(true)
+  fares       TourFare[]
+  photos      Media[]
+  enquiries   Enquiry[]
+  createdAt   DateTime @default(now())
+  updatedAt   DateTime @updatedAt
+}
+
+// A published fare for ONE pick-up point on ONE tour. Most tours have none — their fare is
+// agreed on WhatsApp. A Tour itself never carries a single price: it depends on the pick-up.
+model TourFare {
+  id         String   @id @default(cuid())
+  tourId     String
+  tour       Tour     @relation(fields: [tourId], references: [id], onDelete: Cascade)
+  pickupName String                        // "Kel", "Sharda" — plain text, no separate model
+  priceMin   Int                           // PKR, per jeep
+  priceMax   Int?                          // null = a single fixed price, not a range
+  note       String?                       // "Varies with season and road condition"
+  order      Int      @default(0)
+  published  Boolean  @default(true)
+  updatedAt  DateTime @updatedAt
+}
+
+model Media {
+  id           String    @id @default(cuid())
+  publicId     String                 // Cloudinary public_id — the only thing we store
+  type         MediaType @default(IMAGE)
+  width        Int
+  height       Int
+  duration     Float?                 // seconds, video only
+  alt          String    @default("")
+  placement    Placement              // where it appears on the site
+  brandKey     String?   @unique      // BRAND only: logo-light | logo-dark | favicon | og-image
+  tile         String    @default("") // gallery grid: "tall" | "wide" | ""
+  order        Int       @default(0)
+  published    Boolean   @default(true)
+  roomId       String?
+  room         Room?     @relation(fields: [roomId], references: [id], onDelete: Cascade)
+  tourId       String?
+  tour         Tour?     @relation(fields: [tourId], references: [id], onDelete: Cascade)
+  createdAt    DateTime  @default(now())
+}
+
+enum MediaType {
+  IMAGE
+  VIDEO
+}
+enum Placement {
+  HERO
+  ROOM
+  TOUR
+  GALLERY
+  STORY
+  DINING
+  CTA
+  PAGE_HEADER
+  BRAND
+}
+
+model Enquiry {
+  id        String        @id @default(cuid())
+  name      String
+  phone     String
+  checkIn   DateTime?
+  checkOut  DateTime?
+  guests    String?
+  message   String        @db.Text
+  kind      EnquiryKind   @default(STAY)
+  source    String                    // "bookbar" | "contact-form" | "room-card" | "tour-card"
+  status    EnquiryStatus @default(NEW)
+  roomId    String?
+  room      Room?         @relation(fields: [roomId], references: [id])
+  tourId    String?
+  tour      Tour?         @relation(fields: [tourId], references: [id])
+  pickupPoint String?               // the pick-up the guest chose, as plain text
+  createdAt DateTime      @default(now())
+}
+
+enum EnquiryKind {
+  STAY
+  TOUR
+}
+
+enum EnquiryStatus {
+  NEW
+  REPLIED
+  CLOSED
+}
+
+/// Guest reviews shown on the homepage.
+///
+/// NOT in PROMPT.md section 4 — added 20 Sep 2026, replacing three invented
+/// testimonials that shipped from the designer's mock. The owner copies real
+/// reviews across from the resort's own Google listing through the admin panel;
+/// `source` records where each one came from so the site can attribute it.
+model Review {
+  id        String   @id @default(cuid())
+  author    String
+  body      String   @db.Text
+  rating    Int      @default(5)
+  /// Free text as the owner reads it on Google: "2 weeks ago", "March 2026".
+  whenText  String   @default("")
+  source    String   @default("Google")
+  order     Int      @default(0)
+  published Boolean  @default(true)
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+}
+
+model Setting {
+  key   String @id        // whatsapp, phone, address, heroHeadline, heroSub, seasonBanner,
+  value String @db.Text   // instagram, facebook, tiktok, googleMapsUrl,
+}                         // pickupPoints (one place name per line), ratesUpdated
+
+model AdminUser {
+  id           String @id @default(cuid())
+  email        String @unique
+  passwordHash String
+  name         String
+  role         Role   @default(STAFF)
+  createdAt    DateTime @default(now())
+}
+
+enum Role {
+  OWNER
+  STAFF
+}

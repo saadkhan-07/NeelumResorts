@@ -104,29 +104,59 @@ pnpm prisma db seed
 `pnpm` build scripts are allow-listed in `pnpm-workspace.yaml` (`allowBuilds:`), not in
 `package.json`.
 
-## Layout notes — `design-reference/` filenames are scrambled
+## Layout notes — `design-reference/` was re-delivered on 18 Sep 2026
 
-The folder is flat, and **every text file is saved under the wrong name**. The contents
-are all correct; only the filenames are wrong. Read by content, not by name:
+The second drop arrived as loose files at the repo root with browser `(2)` suffixes and,
+like the first, **every text file under the wrong name**. It has been copied into
+`design-reference/` under the names the HTML expects:
 
-| File on disk | What it actually contains | Name the HTML expects |
+| File as delivered | What it actually contains | Copied to |
 |---|---|---|
-| `lounge.jpg` | the stylesheet (22 KB CSS) | `css/style.css` |
-| `contact.html` | the site script (140 lines of JS) | `js/main.js` |
-| `rooms.html` | the **home** page | `index.html` |
-| `style.css` | the **Our Stays** page | `rooms.html` |
-| `index.html` | the **Gallery** page | `gallery.html` |
-| `gallery.html` | the **Contact & Directions** page | `contact.html` |
+| `style (2).css` | the **home** page | `design-reference/index.html` |
+| `gallery (2).html` | the **Our Stays** page | `design-reference/rooms.html` |
+| `main (1).js` | the **Jeep Tours** page | `design-reference/tours.html` |
+| `story (1).jpg` | the **Gallery** page | `design-reference/gallery.html` |
+| `tours (2).html` | the **Contact & Directions** page | `design-reference/contact.html` |
+| `index (2).html` | a JPEG, 1000×1250 portrait | `design-reference/images/story.jpg` |
+| `contact (2).html` | a JPEG, 1000×750 | `design-reference/images/tour-baboon.jpg` |
 
-So: the stylesheet to port in Phase 1 is `design-reference/lounge.jpg`, and the vanilla JS
-to port is `design-reference/contact.html`.
+All 28 images the five pages reference are present. The last two rows are an inference by
+size and aspect (they were the only two image slots left unfilled) — confirm them by eye
+when the story section and the Baboon Valley tour card are first rendered.
 
-**Gaps in the reference — confirm with the client before the phase that needs them:**
+**The second drop contains no stylesheet and no script.** `design-reference/css/style.css`
+and `design-reference/js/main.js` are the **first** drop's files, restored from git
+(commit `bdac108`). They predate the jeep-tours work, so eight classes the new pages use
+have no rules in them: `.steps`, `.step`, `.room__foot--stack`, `.tour__fares`, `.tour__wa`,
+`.fare-table`, `.rates-note`, `.pickup`.
 
-- Three images are genuinely absent, not just misnamed: `images/story.jpg`, `images/g7.jpg`
-  and the real `images/lounge.jpg` photo.
-- **There is no jeep-tours design.** PROMPT.md § 3 says the reference contains `tours.html`
-  and a homepage tours section; it does not — the word "tour" appears nowhere in
-  `design-reference/`, and the reference nav is Home · Stays · Gallery · Contact. The tours
-  pages in Phase 3 must be composed from the existing design system (`.rooms`/`.room`
-  cards, `.features`, `.room-row`, `.split`) rather than matched to a reference page.
+Phase 3 had to render those sections, so `src/styles/global.css` now ends with a **PHASE 3
+ADDENDUM** block writing those eight classes from the reference's own tokens and the spacing
+of neighbouring components. Everything above that banner is still the byte-exact port.
+**It is the one part of the build that is not a port** — when the real `css/style.css`
+arrives, delete the addendum and re-port. Ask the client's designer for it.
+
+**`design-reference/images/story.jpg` is not a photograph.** When the second drop was
+copied into place, the rename loop matched `story (1).jpg` — which actually held the Gallery
+*page* — and overwrote the real JPEG with it. The source file (`index (2).html`, a
+1000x1250 portrait) has since been deleted from the repo root, so the photograph is gone.
+Two slots use it: the homepage story split and one gallery tile. `/ref-images` checks magic
+bytes and 404s rather than serving HTML as an image. **Ask the client to re-send that one
+photo.**
+
+## Phase 3 notes
+
+- Images are served by `src/app/ref-images/[file]/route.ts` straight out of
+  `design-reference/images/`, so `/public` stays empty (rule 6). **Phase 4 deletes that
+  route** along with `SLUG_IMAGES` / `SLOT_IMAGES` in `src/lib/copy.ts`.
+- `RefImage` has two modes and the choice matters: `fill` where the *container* is sized by
+  CSS, explicit `width`/`height` + `height:auto` where the reference put `aspect-ratio` on
+  the `img` itself (`.split__media img`, `.room-row__media img`). Getting this wrong
+  collapses the whole section to zero height.
+- `src/lib/copy.ts` holds page copy that has no database model — FAQ, guest quotes, stats,
+  the feature grids, page headers. PROMPT.md § 4 defines no model for any of it and Phase 6
+  gives the owner no screen to edit it. Rooms, tours, fares and settings all come from the
+  database; nothing in `src/` imports `prisma/data.ts`.
+- The reference has no per-room or per-tour page — `rooms.html` and `tours.html` stack every
+  item as a `.room-row` with an id anchor. `/stays/[slug]` and `/tours/[slug]` render that
+  same row for one item rather than inventing a second layout.

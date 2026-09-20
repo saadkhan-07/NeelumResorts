@@ -401,3 +401,353 @@ p:last-child{margin-bottom:0}
   .amenity-list{grid-template-columns:1fr}
   .footer-grid{grid-template-columns:1fr}
 }
+
+/* =========================================================
+   PHASE 3 ADDENDUM — NOT PART OF THE PORTED REFERENCE STYLESHEET
+   ---------------------------------------------------------
+   The second design-reference delivery (18 Sep 2026) contained the five HTML
+   pages and all 28 images but NO css/style.css. The stylesheet this file was
+   ported from is the FIRST delivery's, which predates the jeep-tours work, so
+   these eight classes — used by tours.html and by the tour cards on index.html —
+   have no rules anywhere:
+
+     .steps  .step  .room__foot--stack  .tour__fares
+     .tour__wa  .fare-table  .rates-note  .pickup
+
+   Everything below is written from the reference's own tokens and the spacing of
+   its neighbouring components. It is the one part of this build that is not a
+   port, and it is the first thing to delete when the real stylesheet arrives.
+   Nothing above this line has been touched.
+   ========================================================= */
+
+/* the three-step strip — /tours and the homepage tours section */
+.steps{
+  display:grid;grid-template-columns:repeat(3,1fr);gap:1px;
+  background:var(--line);border:1px solid var(--line);margin-bottom:clamp(40px,5vw,64px);
+}
+.step{background:var(--cream);padding:34px 30px}
+.bg-sand .step{background:var(--sand)}
+.step b{
+  display:block;font-family:var(--ff-display);color:var(--brass);
+  font-size:2.4rem;line-height:1;margin-bottom:14px;font-weight:400;
+}
+.step h4{font-size:1.12rem;margin-bottom:9px}
+.step p{font-size:.88rem;margin:0}
+
+/* tour card foot: the fare block sits above the button rather than beside it */
+.room__foot--stack{flex-direction:column;align-items:stretch;gap:16px}
+.room__foot--stack .btn{width:100%}
+
+.tour__fares{display:grid;gap:6px}
+.tour__fares span{
+  display:flex;align-items:baseline;justify-content:space-between;gap:12px;
+  font-size:.86rem;color:var(--ink);
+}
+.tour__fares i{
+  font-style:normal;font-size:.68rem;letter-spacing:.2em;text-transform:uppercase;
+  color:var(--brass);font-weight:500;
+}
+.tour__fares small{
+  display:block;margin-top:6px;font-size:.7rem;line-height:1.5;
+  color:var(--body);opacity:.75;
+}
+
+/* the same slot when no fare is published — deliberate, not a gap */
+.tour__wa{
+  font-size:.8rem;line-height:1.6;color:var(--ink);
+  letter-spacing:.02em;
+}
+.tour__wa::first-line{
+  font-weight:500;
+}
+
+/* the fare table on a tour detail */
+.fare-table{
+  width:100%;border-collapse:collapse;margin:26px 0 14px;
+  border-top:1px solid var(--line);border-bottom:1px solid var(--line);
+}
+.fare-table th{
+  font-family:var(--ff-body);font-size:.63rem;letter-spacing:.24em;text-transform:uppercase;
+  color:var(--brass);font-weight:500;text-align:left;padding:14px 0;
+  border-bottom:1px solid var(--line);
+}
+.fare-table td{
+  padding:14px 0;font-size:.95rem;color:var(--ink);
+  border-bottom:1px solid var(--line);
+}
+.fare-table tbody tr:last-child td{border-bottom:0}
+.fare-table td:last-child{text-align:right;white-space:nowrap}
+
+.rates-note{font-size:.78rem;line-height:1.7;color:var(--body);opacity:.8;margin:0 0 26px}
+
+/* "Where should we pick you up?" */
+.pickup{margin:0 0 22px;max-width:360px}
+.pickup label{
+  display:block;font-size:.63rem;letter-spacing:.22em;text-transform:uppercase;
+  color:var(--brass);font-weight:500;margin-bottom:8px;
+}
+.pickup select{
+  width:100%;padding:14px 16px;border:1px solid var(--line);background:var(--white);
+  font-family:var(--ff-body);font-size:.95rem;color:var(--ink);border-radius:var(--r);
+  outline:none;transition:border-color .3s;
+}
+.pickup select:focus{border-color:var(--brass)}
+
+@media (max-width:900px){
+  .steps{grid-template-columns:1fr}
+}
+
+/* =========================================================
+   BRAND MARK IN THE HEADER — not part of the ported stylesheet
+   ---------------------------------------------------------
+   Reworked 20 Sep 2026 against roameoresorts.com, whose header is transparent
+   with a 37px-tall logo in a 96px bar. Three changes from the first version:
+
+   1. Sized by HEIGHT, not a fixed 34x34 square. That square shrank the mark to
+      an illegible chip and would have mangled a wide wordmark entirely.
+   2. Both images are only cross-faded when two really exist. With one upload
+      the same file is used in both header states — it used to fade to nothing
+      on scroll, because no logo-dark had been uploaded.
+   3. A wordmark (ratio >= 2.5) hides the typeset name beside it, since the
+      image already carries it. A square emblem keeps the text.
+   ========================================================= */
+.logo__mark{
+  display:block;flex:none;position:relative;
+  /* generous over the hero, tightened once the bar compacts on scroll */
+  height:48px;width:auto;aspect-ratio:auto;
+  transition:height .45s var(--ease);
+}
+.logo__img{
+  display:block;height:100%;width:auto;max-width:210px;object-fit:contain;
+  transition:opacity .45s var(--ease);
+}
+/* Stack the two only when there are genuinely two to cross-fade. */
+.logo__mark:has(.logo__img--dark) .logo__img{position:absolute;inset:0;height:100%}
+.logo__mark:has(.logo__img--dark) .logo__img--dark{opacity:0}
+.site-header.is-solid .logo__mark:has(.logo__img--dark) .logo__img--light{opacity:0}
+.site-header.is-solid .logo__mark:has(.logo__img--dark) .logo__img--dark{opacity:1}
+/* The footer sits on --ink, so it always wants the light mark. */
+.site-footer .logo__img--light{opacity:1}
+.site-footer .logo__img--dark{opacity:0}
+
+/* Constant, as on the reference: their logo is 37px tall at every scroll
+   position. Only the bar's padding tightens. */
+.site-header.is-solid .logo__mark{height:48px}
+.site-footer .logo__mark{height:44px}
+
+/* A wordmark already says the name; the typeset version beside it is a repeat.
+   Kept in the accessibility tree so the link still announces itself. */
+.logo--wordmark .logo__text{
+  position:absolute;width:1px;height:1px;overflow:hidden;
+  clip-path:inset(50%);white-space:nowrap;
+}
+
+/* The scrolled header, matched to roameoresorts.com. Measured on their live
+   site, 20 Sep 2026:
+
+     scrollY 0     background: rgba(0, 0, 0, 0)     fully transparent
+     scrollY 200+  background: rgba(0, 0, 0, 0.4)   40% black scrim
+     logo stays the same size throughout (175x37 on theirs)
+
+   So it is never an opaque bar, and never fully transparent once you scroll:
+   a 40% black tint rides over whatever is behind it. That is what keeps a white
+   logo and white nav readable over their light sections, and it is why the
+   cream bar in the ported stylesheet is replaced here.
+
+   `backdrop-filter` is ours, not theirs — a 2px blur costs nothing and stops
+   busy photography showing through the type. Remove that one line for a literal
+   match. */
+.site-header.is-solid{
+  background:rgba(0,0,0,.4);
+  box-shadow:none;
+  -webkit-backdrop-filter:blur(2px);backdrop-filter:blur(2px);
+}
+/* White in both states, because the ground behind is dark in both states. */
+.site-header.is-solid .logo,
+.site-header.is-solid .nav a{color:#fff}
+.site-header.is-solid .burger span{background:#fff}
+
+@media (max-width:900px){
+  .logo__mark{height:42px}
+  .site-header.is-solid .logo__mark{height:42px}
+  .logo__img{max-width:150px}
+}
+
+/* Season banner — Phase 6. Sits above the fixed header, so the header offsets
+   by its height when one is showing. */
+.season-banner{
+  position:fixed;inset:0 0 auto;z-index:95;margin:0;
+  background:var(--brass);color:#fff;text-align:center;
+  padding:9px 18px;font-size:.78rem;letter-spacing:.06em;
+}
+body:has(.season-banner) .site-header{top:var(--banner-h,38px)}
+
+/* =========================================================
+   MOBILE DRAWER — NOT PART OF THE PORTED REFERENCE STYLESHEET
+   ---------------------------------------------------------
+   Requested change, 20 Sep 2026. The reference's mobile menu is a full-screen
+   fade-in; on a real phone it had three defects:
+
+     1. "Book on WhatsApp" rendered 433px wide inside a 390px viewport, so the
+        text was clipped at BOTH ends.
+     2. The panel appeared instantly over the whole screen with no sense of
+        where it came from — the "popping out from above" complaint.
+     3. The page behind kept scrolling while the menu was open.
+
+   This replaces it with a slide-in drawer, which is the pattern the reference
+   site (roameoresorts.com) uses itself. It overrides the ported `.mobile-nav`
+   rules above; delete this block to get the original fade back.
+   ========================================================= */
+
+/* the dimmed page behind the drawer */
+.mobile-scrim{
+  position:fixed;inset:0;z-index:94;
+  background:rgba(15,24,20,.55);
+  opacity:0;visibility:hidden;
+  transition:opacity .32s var(--ease),visibility .32s var(--ease);
+  -webkit-backdrop-filter:blur(2px);backdrop-filter:blur(2px);
+}
+.mobile-scrim.is-open{opacity:1;visibility:visible}
+
+/* the panel itself — overrides the reference's full-screen overlay */
+.mobile-nav{
+  position:fixed;
+  top:0;right:0;bottom:0;left:auto;          /* a drawer, not a sheet */
+  z-index:96;
+  width:min(86vw,360px);
+  background:var(--pine);
+  display:flex;flex-direction:column;
+  align-items:stretch;justify-content:flex-start;gap:0;
+  padding:0 0 env(safe-area-inset-bottom,0px);
+  box-shadow:-18px 0 50px -24px rgba(0,0,0,.6);
+  transform:translateX(100%);
+  opacity:1;visibility:hidden;
+  /* visibility is stepped, not eased: it waits out the slide on the way closed,
+     and flips the instant the drawer opens. Transitioning it like transform
+     leaves the panel hidden for the first frames, and nothing inside a hidden
+     subtree can take focus — so the drawer opened with the keyboard still on
+     the burger behind it. */
+  transition:transform .34s var(--ease),visibility 0s linear .34s;
+  overflow-y:auto;overscroll-behavior:contain;
+}
+.mobile-nav.is-open{
+  transform:translateX(0);visibility:visible;opacity:1;
+  transition:transform .34s var(--ease),visibility 0s linear 0s;
+}
+
+/* header row: brand left, close right */
+.mobile-nav__head{
+  display:flex;align-items:center;gap:12px;
+  padding:calc(18px + env(safe-area-inset-top,0px)) 20px 18px;
+  border-bottom:1px solid rgba(255,255,255,.12);
+}
+.mobile-nav__brand{display:flex;align-items:center;gap:11px;color:#fff;min-width:0}
+.mobile-nav__brand svg{width:30px;height:30px;flex:none}
+.mobile-nav__brand b{
+  display:block;font-family:var(--ff-display);font-size:1.02rem;
+  font-weight:500;line-height:1.15;letter-spacing:.02em;
+}
+.mobile-nav__brand small{
+  display:block;font-size:.54rem;letter-spacing:.3em;text-transform:uppercase;
+  opacity:.65;font-weight:400;
+}
+
+/* the close button, overriding the reference's absolutely-positioned × */
+.mobile-nav .close{
+  position:static;margin-left:auto;flex:none;
+  width:44px;height:44px;display:grid;place-items:center;
+  border-radius:50%;border:1px solid rgba(255,255,255,.2);
+  background:none;color:#fff;font-size:1rem;cursor:pointer;line-height:1;
+  transition:background .2s var(--ease),border-color .2s var(--ease);
+}
+.mobile-nav .close:hover{background:rgba(255,255,255,.1);border-color:rgba(255,255,255,.4)}
+
+/* links as a list with real tap targets, not centred display type */
+.mobile-nav__links{display:flex;flex-direction:column;padding:8px 0}
+.mobile-nav a{
+  display:flex;align-items:center;justify-content:space-between;gap:12px;
+  min-height:54px;padding:0 20px;
+  font-family:var(--ff-display);font-size:1.32rem;font-weight:400;
+  color:#fff;border-bottom:1px solid rgba(255,255,255,.07);
+  transition:background .2s var(--ease),padding-left .2s var(--ease);
+}
+.mobile-nav a:last-child{border-bottom:0}
+.mobile-nav a svg{opacity:.4;flex:none}
+.mobile-nav a:hover,.mobile-nav a:focus-visible{background:rgba(255,255,255,.06);padding-left:24px}
+.mobile-nav a:hover svg,.mobile-nav a:focus-visible svg{opacity:.85;color:var(--brass-lt)}
+
+/* the CTA, which previously overflowed the viewport */
+.mobile-nav__foot{margin-top:auto;padding:18px 20px calc(20px + env(safe-area-inset-bottom,0px))}
+.mobile-nav .btn.mobile-nav__cta{
+  margin-top:0;width:100%;
+  /* the reference's .18em tracking is what pushed this past the screen edge */
+  letter-spacing:.1em;padding-inline:16px;
+  white-space:normal;                 /* it can wrap rather than be clipped */
+}
+
+.mobile-nav a:focus-visible,.mobile-nav .close:focus-visible{
+  outline:2px solid var(--brass-lt);outline-offset:-3px;
+}
+
+@media (prefers-reduced-motion:reduce){
+  .mobile-nav,.mobile-scrim{transition:none}
+}
+
+/* =========================================================
+   PHOTO STRIP — not part of the ported reference stylesheet
+   ---------------------------------------------------------
+   Added 20 Sep 2026. The reference draws one photograph per room row; rooms and
+   tours can have several, and the rest were being dropped on the floor. A large
+   image over a row of thumbnails is the arrangement guests already know from
+   every booking site, and it reuses the reference's own lightbox underneath.
+   ========================================================= */
+
+/* The main image doubles as the button that opens the viewer. */
+.photo-strip__main{
+  display:block;width:100%;padding:0;border:0;background:none;
+  position:relative;cursor:zoom-in;border-radius:var(--r);overflow:hidden;
+  line-height:0;
+}
+.photo-strip__main img{transition:transform 1s var(--ease)}
+.photo-strip__main:hover img{transform:scale(1.03)}
+
+/* "2 / 6" — so it is obvious there is more than one before anything is tapped. */
+.photo-strip__count{
+  position:absolute;right:12px;bottom:12px;
+  background:rgba(15,24,20,.62);color:#fff;
+  -webkit-backdrop-filter:blur(4px);backdrop-filter:blur(4px);
+  font-size:.66rem;letter-spacing:.16em;text-transform:uppercase;
+  padding:6px 11px;border-radius:100px;line-height:1;
+}
+
+.photo-strip__thumbs{
+  display:flex;gap:8px;margin-top:10px;
+  /* A phone gets a swipeable row rather than a cramped wrap. */
+  overflow-x:auto;overscroll-behavior-x:contain;
+  scroll-snap-type:x proximity;
+  scrollbar-width:thin;padding-bottom:2px;
+}
+.photo-strip__thumbs button{
+  flex:0 0 auto;width:84px;aspect-ratio:4/3;
+  padding:0;border:0;background:var(--sand);cursor:pointer;
+  border-radius:var(--r);overflow:hidden;scroll-snap-align:start;
+  opacity:.62;transition:opacity .25s var(--ease),box-shadow .25s var(--ease);
+  line-height:0;
+}
+.photo-strip__thumbs button img{width:100%;height:100%;object-fit:cover}
+.photo-strip__thumbs button:hover{opacity:.85}
+.photo-strip__thumbs button.is-active{
+  opacity:1;box-shadow:inset 0 0 0 2px var(--brass);
+}
+.photo-strip__main:focus-visible,
+.photo-strip__thumbs button:focus-visible{
+  outline:2px solid var(--brass);outline-offset:2px;
+}
+
+@media (max-width:560px){
+  .photo-strip__thumbs button{width:68px}
+}
+@media (prefers-reduced-motion:reduce){
+  .photo-strip__main img,.photo-strip__thumbs button{transition:none}
+  .photo-strip__main:hover img{transform:none}
+}

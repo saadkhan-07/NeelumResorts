@@ -7,9 +7,14 @@ import { Button } from "./Button";
 import { Logo } from "./Logo";
 import { MobileNav } from "./MobileNav";
 import { NAV_LINKS } from "@/lib/nav";
-import { WA_BOOKING } from "@/lib/site";
+import { waBooking } from "@/lib/wa";
+import type { Brand } from "@/lib/queries";
 
 type HeaderProps = {
+  /** From `Setting["whatsapp"]` — never hardcoded. */
+  whatsapp: string;
+  /** BRAND rows; every slot may be empty, and the mark falls back to inline SVG. */
+  brand?: Brand;
   /**
    * `"always"` keeps the header solid from the top, for pages with no hero
    * behind it. Otherwise it is transparent until the hero has scrolled past.
@@ -17,7 +22,7 @@ type HeaderProps = {
   solid?: "always";
 };
 
-export function Header({ solid }: HeaderProps) {
+export function Header({ solid, whatsapp, brand }: HeaderProps) {
   const [isSolid, setIsSolid] = useState(solid === "always");
   const [menuOpen, setMenuOpen] = useState(false);
   const pathname = usePathname();
@@ -40,7 +45,7 @@ export function Header({ solid }: HeaderProps) {
     <>
       <header className={isSolid ? "site-header is-solid" : "site-header"}>
         <div className="wrap">
-          <Logo />
+          <Logo brand={brand} />
           <nav className="nav">
             {NAV_LINKS.map((link) => (
               <Link
@@ -52,7 +57,7 @@ export function Header({ solid }: HeaderProps) {
               </Link>
             ))}
           </nav>
-          <Button variant="primary" small className="header-cta" wa={WA_BOOKING}>
+          <Button variant="primary" small className="header-cta" wa={waBooking} whatsapp={whatsapp}>
             Book on WhatsApp
           </Button>
           <button
@@ -68,7 +73,7 @@ export function Header({ solid }: HeaderProps) {
           </button>
         </div>
       </header>
-      <MobileNav open={menuOpen} onClose={() => setMenuOpen(false)} />
+      <MobileNav open={menuOpen} onClose={() => setMenuOpen(false)} whatsapp={whatsapp} />
     </>
   );
 }
