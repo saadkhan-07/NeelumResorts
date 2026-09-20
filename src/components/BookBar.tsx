@@ -19,23 +19,77 @@ import { waBookbar, waLink } from "@/lib/wa";
  * on purpose: if the write fails the guest still reaches WhatsApp, which is the
  * only outcome that matters. The write itself lands in Phase 6.
  */
+/**
+ * Today, plus n days, as yyyy-mm-dd in the visitor's OWN timezone.
+ *
+ * `toISOString()` would be wrong here: it converts to UTC first, so in Pakistan
+ * (UTC+5) any time before 05:00 local reports yesterday's date — the bar would
+ * open offering a check-in that has already passed.
+ */
+function isoDay(offset: number) {
+  const d = new Date();
+  d.setDate(d.getDate() + offset);
+  const pad = (n: number) => String(n).padStart(2, "0");
+  return `${d.getFullYear()}-${pad(d.getMonth() + 1)}-${pad(d.getDate())}`;
+}
+
+function nextDay(iso: string) {
+  const [y, m, d] = iso.split("-").map(Number);
+  const date = new Date(y, m - 1, d + 1);
+  const pad = (n: number) => String(n).padStart(2, "0");
+  return `${date.getFullYear()}-${pad(date.getMonth() + 1)}-${pad(date.getDate())}`;
+}
+
 export function BookBar({ whatsapp, roomNames }: { whatsapp: string; roomNames: string[] }) {
   const form = useRef<HTMLFormElement>(null);
-  const [dates, setDates] = useState<{ checkin: string; checkout: string } | null>(null);
+  const [checkin, setCheckin] = useState("");
+  const [checkout, setCheckout] = useState("");
+  const [today, setToday] = useState("");
+  const [error, setError] = useState<string | null>(null);
 
   // Tomorrow → the day after, matching the reference script. Computed after mount
   // so the server and client markup agree and the page stays statically cacheable.
   useEffect(() => {
-    const iso = (d: Date) => d.toISOString().split("T")[0];
-    setDates({
-      checkin: iso(new Date(Date.now() + 864e5)),
-      checkout: iso(new Date(Date.now() + 1728e5)),
-    });
+    setToday(isoDay(0));
+    setCheckin(isoDay(1));
+    setCheckout(isoDay(2));
   }, []);
+
+  /**
+   * Moving check-in past check-out drags check-out with it, rather than leaving
+   * the guest looking at a range that reads backwards. A night is the minimum:
+   * a check-out on the arrival day is not a stay.
+   */
+  function onCheckinChange(value: string) {
+    setCheckin(value);
+    if (value && checkout && checkout <= value) setCheckout(nextDay(value));
+    setError(null);
+  }
+
+  function onCheckoutChange(value: string) {
+    setCheckout(value);
+    setError(null);
+  }
 
   function onSubmit(event: React.FormEvent<HTMLFormElement>) {
     event.preventDefault();
+
     const data = new FormData(event.currentTarget);
+
+    // Validate what is actually being submitted, not what React thinks the state
+    // is. `min` on a date input is no guarantee — it is not enforced against a
+    // typed value in every browser and is trivially removed in dev tools — and
+    // if the DOM and the component state ever disagree, FormData is the one that
+    // reaches WhatsApp. Checking the same object we send is the only version of
+    // this check that cannot be walked around.
+    const from = String(data.get("checkin") ?? "");
+    const to = String(data.get("checkout") ?? "");
+    if (from && to && to <= from) {
+      setError("Check-out needs to be after check-in.");
+      return;
+    }
+    setError(null);
+
     const url = waLink(
       whatsapp,
       waBookbar({
@@ -69,9 +123,9 @@ export function BookBar({ whatsapp, roomNames }: { whatsapp: string; roomNames: 
               type="date"
               id="ci"
               name="checkin"
-              defaultValue={dates?.checkin}
-              key={`ci-${dates?.checkin ?? ""}`}
-              min={dates?.checkin}
+              value={checkin}
+              onChange={(e) => onCheckinChange(e.target.value)}
+              min={today}
             />
           </div>
           <div className="bookbar__field">
@@ -80,9 +134,13 @@ export function BookBar({ whatsapp, roomNames }: { whatsapp: string; roomNames: 
               type="date"
               id="co"
               name="checkout"
-              defaultValue={dates?.checkout}
-              key={`co-${dates?.checkout ?? ""}`}
-              min={dates?.checkin}
+              value={checkout}
+              onChange={(e) => onCheckoutChange(e.target.value)}
+              /* The floor follows the chosen check-in, not the value it happened
+                 to hold when the page loaded — that was the bug. */
+              min={checkin ? nextDay(checkin) : today}
+              aria-invalid={Boolean(error)}
+              aria-describedby={error ? "bookbar-error" : undefined}
             />
           </div>
           <div className="bookbar__field">
@@ -105,6 +163,11 @@ export function BookBar({ whatsapp, roomNames }: { whatsapp: string; roomNames: 
               ))}
             </select>
           </div>
+          {error ? (
+            <p className="bookbar__error" id="bookbar-error" role="alert">
+              {error}
+            </p>
+          ) : null}
           <button className="btn btn--primary" type="submit">
             <WhatsAppIcon />
             Check on WhatsApp

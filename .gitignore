@@ -43,3 +43,7 @@ next-env.d.ts
 
 # prisma
 /src/generated/
+
+# database dumps — never commit these, they contain every row including password hashes
+dev.dump
+*.dump

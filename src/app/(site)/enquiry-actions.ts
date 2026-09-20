@@ -28,7 +28,26 @@ const schema = z.object({
   roomSlug: z.string().trim().max(120).optional(),
   tourSlug: z.string().trim().max(120).optional(),
   pickupPoint: z.string().trim().max(120).optional(),
-});
+})
+  /**
+   * A stay cannot end before it starts.
+   *
+   * The form already blocks this, but this action is a public endpoint — it is
+   * how the website talks to itself, and anything can POST to it. Since the
+   * `Enquiry` row is the only record of a booking request that exists anywhere
+   * (rule 1: there is no email), a nonsense range must not be able to reach it
+   * and have the owner ring a guest about dates they never asked for.
+   */
+  .refine(
+    (d) => {
+      if (!d.checkIn || !d.checkOut) return true;
+      const from = new Date(d.checkIn);
+      const to = new Date(d.checkOut);
+      if (Number.isNaN(from.getTime()) || Number.isNaN(to.getTime())) return true;
+      return to > from;
+    },
+    { message: "Check-out must be after check-in", path: ["checkOut"] },
+  );
 
 export type EnquiryInput = z.input<typeof schema>;
 

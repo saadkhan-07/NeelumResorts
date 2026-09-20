@@ -751,3 +751,11 @@ body:has(.season-banner) .site-header{top:var(--banner-h,38px)}
   .photo-strip__main img,.photo-strip__thumbs button{transition:none}
   .photo-strip__main:hover img{transform:none}
 }
+
+/* Validation message in the availability bar — added 20 Sep 2026 with the
+   check-out date fix. It spans the grid so it never squeezes a field. */
+.bookbar__error{
+  grid-column:1/-1;margin:0;
+  background:#fdecea;color:#b3261e;border-top:1px solid #f3c4c0;
+  font-size:.8rem;letter-spacing:.02em;padding:10px 24px;
+}
