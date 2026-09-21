@@ -21,7 +21,7 @@ export function SettingsForm({ settings }: { settings: Settings }) {
           defaultValue={settings.whatsapp}
           inputMode="numeric"
           required
-          placeholder="923556804073"
+          placeholder="92XXXXXXXXXX"
         />
         <small style={{ color: "var(--a-muted)", fontSize: ".78rem" }}>
           Country code first, no plus sign and no spaces. Every enquiry button on the
@@ -32,7 +32,7 @@ export function SettingsForm({ settings }: { settings: Settings }) {
       <div className="admin-form__row">
         <div className="admin-field">
           <label htmlFor="phone">Phone, for calling</label>
-          <input id="phone" name="phone" defaultValue={settings.phone} required placeholder="+923556804073" />
+          <input id="phone" name="phone" defaultValue={settings.phone} required placeholder="+92XXXXXXXXXX" />
         </div>
         <div className="admin-field">
           <label htmlFor="phoneDisplay">Phone, as written</label>
@@ -41,7 +41,7 @@ export function SettingsForm({ settings }: { settings: Settings }) {
             name="phoneDisplay"
             defaultValue={settings.phoneDisplay}
             required
-            placeholder="+92 355 6804073"
+            placeholder="+92 3XX XXXXXXX"
           />
         </div>
       </div>

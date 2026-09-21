@@ -272,9 +272,8 @@ export const tours: Prisma.TourCreateInput[] = [
  * you up?" selector on every tour. The selector appends "Somewhere else" itself.
  */
 export const settings: Record<string, string> = {
-  whatsapp: "923556804073",
-  phone: "+923556804073",
-  phoneDisplay: "+92 355 6804073",
+  // whatsapp, phone and phoneDisplay are not here: they come from RESORT_WHATSAPP /
+  // RESORT_PHONE / RESORT_PHONE_DISPLAY, which seed.ts reads after loading .env.local.
   address: "Neelum Valley Road, Taobat 13231\nAzad Jammu & Kashmir",
   googleMapsUrl: "https://maps.google.com/?q=Neelum+Resort+Taobat",
 

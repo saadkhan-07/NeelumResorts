@@ -12,6 +12,7 @@ import { config } from "dotenv";
 import { PrismaPg } from "@prisma/adapter-pg";
 import bcrypt from "bcryptjs";
 import { PrismaClient } from "../src/generated/prisma/client";
+import { contactFromEnv } from "../src/lib/contact-env";
 import { rooms, settings, tours } from "./data";
 import { seedMedia } from "./seed-media";
 
@@ -71,14 +72,23 @@ async function seedTours() {
 }
 
 async function seedSettings() {
-  for (const [key, value] of Object.entries(settings)) {
+  // Read here, not in data.ts: imports run before config() has loaded .env.local.
+  const contact = contactFromEnv();
+  if (!contact.whatsapp) {
+    throw new Error(
+      "RESORT_WHATSAPP is not set. Add it to .env.local — every enquiry button uses it.",
+    );
+  }
+  const all = { ...settings, ...contact };
+
+  for (const [key, value] of Object.entries(all)) {
     await prisma.setting.upsert({
       where: { key },
       update: { value },
       create: { key, value },
     });
   }
-  return Object.keys(settings).length;
+  return Object.keys(all).length;
 }
 
 async function seedAdmin() {

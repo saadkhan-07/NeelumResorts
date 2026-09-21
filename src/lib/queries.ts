@@ -1,5 +1,6 @@
 import { cache } from "react";
 import type { Placement, Prisma } from "@/generated/prisma/client";
+import { contactFromEnv } from "./contact-env";
 import { prisma } from "./db";
 
 /**
@@ -120,12 +121,16 @@ export const getTour = cache(async (slug: string): Promise<TourWithFares | null>
  * a complete object — on an empty database it returns exactly this.
  *
  * These mirror `prisma/data.ts`, deliberately duplicated rather than imported: that
- * file belongs to the seed alone.
+ * file belongs to the seed alone. The contact numbers are the exception — they are
+ * never written in code and come from RESORT_WHATSAPP / RESORT_PHONE /
+ * RESORT_PHONE_DISPLAY (see `contact-env.ts`).
  */
+const CONTACT = contactFromEnv();
+
 export const SETTING_DEFAULTS = {
-  whatsapp: "923556804073",
-  phone: "+923556804073",
-  phoneDisplay: "+92 355 6804073",
+  whatsapp: CONTACT.whatsapp,
+  phone: CONTACT.phone,
+  phoneDisplay: CONTACT.phoneDisplay,
   address: "Neelum Valley Road, Taobat 13231\nAzad Jammu & Kashmir",
   googleMapsUrl: "https://maps.google.com/?q=Neelum+Resort+Taobat",
   heroHeadline: "Where the valley *ends*, and the quiet begins.",
@@ -160,6 +165,14 @@ export const getSettings = cache(async (): Promise<Settings> => {
   for (const key of Object.keys(SETTING_DEFAULTS) as SettingKey[]) {
     const value = stored.get(key);
     if (value !== undefined) settings[key] = value;
+  }
+
+  // Every enquiry button on the site points at this number. Rule 1 above says a
+  // bare database must still render, so this is a loud log rather than a throw.
+  if (!settings.whatsapp) {
+    console.error(
+      "[settings] No WhatsApp number: the Setting row is missing and RESORT_WHATSAPP is not set.",
+    );
   }
 
   return settings;
