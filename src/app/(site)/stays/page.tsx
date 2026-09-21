@@ -2,7 +2,7 @@ import { PageHead } from "@/components/PageHead";
 import { RoomRow } from "@/components/rows";
 import { CtaBand, FeatureGrid } from "@/components/sections";
 import { CTA_BANDS, PAGE_HEADS, ROOM_INCLUDES } from "@/lib/copy";
-import { getMedia, getRooms, getSettings } from "@/lib/queries";
+import { getMedia, getRooms, getSettings, getPageHeader } from "@/lib/queries";
 import { waAvailability } from "@/lib/wa";
 import Link from "next/link";
 
@@ -15,16 +15,16 @@ export const metadata = {
 };
 
 export default async function StaysPage() {
-  const [rooms, settings, headers, cta] = await Promise.all([
+  const [rooms, settings, header, cta] = await Promise.all([
     getRooms(),
     getSettings(),
-    getMedia("PAGE_HEADER"),
+    getPageHeader("stays"),
     getMedia("CTA"),
   ]);
 
   return (
     <>
-      <PageHead media={headers[0]} {...PAGE_HEADS.stays} />
+      <PageHead media={header} {...PAGE_HEADS.stays} />
 
       <section className="section">
         <div className="wrap">

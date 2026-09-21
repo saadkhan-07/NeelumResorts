@@ -80,6 +80,7 @@ model Media {
   alt          String    @default("")
   placement    Placement              // where it appears on the site
   brandKey     String?   @unique      // BRAND only: logo-light | logo-dark | favicon | og-image
+  pageKey      String?   @unique      // PAGE_HEADER only: stays | tours | gallery | contact
   tile         String    @default("") // gallery grid: "tall" | "wide" | ""
   order        Int       @default(0)
   published    Boolean   @default(true)

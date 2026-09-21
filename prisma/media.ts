@@ -38,6 +38,8 @@ export type SeedMedia = {
   order: number;
   /** Gallery grid only. */
   tile?: "tall" | "wide" | "";
+  /** PAGE_HEADER only: which inner page this photo heads. */
+  pageKey?: "stays" | "tours" | "gallery" | "contact";
   /** Attach to this room/tour slug. */
   roomSlug?: string;
   tourSlug?: string;
@@ -176,12 +178,14 @@ const GALLERY: SeedMedia[] = [
  * Page headers, one per inner route, in route order: stays, tours, gallery,
  * contact. All four are genuine resort or valley photographs.
  */
-const PAGE_HEADERS: SeedMedia[] = [
-  { file: "hero-2.jpg", alt: "", order: 0 },
-  { file: "lounge.jpg", alt: "", order: 1 },
-  { file: "cta.jpg", alt: "", order: 2 },
-  { file: "tour-rattigali.jpg", alt: "", order: 3 },
-].map((item) => ({
+const PAGE_HEADERS: SeedMedia[] = (
+  [
+    { file: "hero-2.jpg", alt: "", order: 0, pageKey: "stays" },
+    { file: "lounge.jpg", alt: "", order: 1, pageKey: "tours" },
+    { file: "cta.jpg", alt: "", order: 2, pageKey: "gallery" },
+    { file: "tour-rattigali.jpg", alt: "", order: 3, pageKey: "contact" },
+  ] as const
+).map((item) => ({
   ...item,
   placement: "PAGE_HEADER" as const,
   folder: "neelum/misc",

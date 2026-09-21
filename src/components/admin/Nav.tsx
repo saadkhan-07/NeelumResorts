@@ -40,6 +40,7 @@ const LINKS: AdminLink[] = [
 /** Desktop-only tail of the sidebar; the phone reaches these from the header. */
 const SECONDARY: AdminLink[] = [
   { href: "/admin/hero", label: "Front page", Icon: GalleryIcon },
+  { href: "/admin/pages", label: "Page photos", Icon: GalleryIcon },
   { href: "/admin/reviews", label: "Reviews", Icon: EnquiryIcon },
   { href: "/admin/branding", label: "Branding", Icon: GalleryIcon },
   { href: "/admin/settings", label: "Settings", Icon: SettingsIcon },

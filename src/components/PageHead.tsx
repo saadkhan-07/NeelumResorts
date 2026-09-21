@@ -13,7 +13,7 @@ export function PageHead({
   title,
   lede,
 }: {
-  media?: MediaRow;
+  media?: MediaRow | null;
   crumb: string;
   title: string;
   lede: string;

@@ -3,7 +3,7 @@ import { PageHead } from "@/components/PageHead";
 import { RoomRow } from "@/components/rows";
 import { CtaBand } from "@/components/sections";
 import { CTA_BANDS, PAGE_HEADS } from "@/lib/copy";
-import { getMedia, getRoom, getRooms, getSettings } from "@/lib/queries";
+import { getMedia, getRoom, getRooms, getSettings, getPageHeader } from "@/lib/queries";
 import { waRoom } from "@/lib/wa";
 
 export const revalidate = 3600;
@@ -30,10 +30,10 @@ export async function generateMetadata({ params }: { params: Promise<{ slug: str
 
 export default async function RoomPage({ params }: { params: Promise<{ slug: string }> }) {
   const { slug } = await params;
-  const [room, settings, headers, cta] = await Promise.all([
+  const [room, settings, header, cta] = await Promise.all([
     getRoom(slug),
     getSettings(),
-    getMedia("PAGE_HEADER"),
+    getPageHeader("stays"),
     getMedia("CTA"),
   ]);
 
@@ -42,7 +42,7 @@ export default async function RoomPage({ params }: { params: Promise<{ slug: str
   return (
     <>
       <PageHead
-        media={headers[0]}
+        media={header}
         crumb={room.name}
         title={room.name}
         lede={room.shortDesc}

@@ -9,7 +9,7 @@ import type { ActionState } from "@/lib/admin-auth";
 import { addMedia, deleteMedia, reorderMedia, updateMedia } from "@/app/admin/media-actions";
 
 /** Mirrors the allow-list in media-actions.ts, which validates it again server-side. */
-export type ManagedPlacement = "HERO" | "GALLERY" | "STORY" | "DINING" | "CTA" | "PAGE_HEADER";
+export type ManagedPlacement = "HERO" | "GALLERY" | "STORY" | "DINING" | "CTA";
 
 export type ManagedMedia = {
   id: string;

@@ -2,6 +2,7 @@ import { cache } from "react";
 import type { Placement, Prisma } from "@/generated/prisma/client";
 import { contactFromEnv } from "./contact-env";
 import { prisma } from "./db";
+import type { PageKey } from "./page-keys";
 
 /**
  * Every read the public site performs. Pages call these; nothing in `src/` ever
@@ -201,6 +202,23 @@ export const getMedia = cache(async (placement: Placement): Promise<MediaRow[]> 
       }),
     [],
   ),
+);
+
+/**
+ * The header photograph for one inner page, or null. Keyed by page rather than
+ * picked by position, so deleting or reordering one can never shift another
+ * page's photo. With none, `.page-head` falls back to solid --ink.
+ */
+export const getPageHeader = cache(
+  async (key: PageKey): Promise<MediaRow | null> =>
+    safe(
+      `getPageHeader(${key})`,
+      () =>
+        prisma.media.findFirst({
+          where: { placement: "PAGE_HEADER", pageKey: key, published: true },
+        }),
+      null,
+    ),
 );
 
 /* ------------------------------------------------------------------ brand */

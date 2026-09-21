@@ -5,7 +5,7 @@ import { TourRow } from "@/components/rows";
 import { ArrowIcon, CheckIcon } from "@/components/icons";
 import { CtaBand } from "@/components/sections";
 import { CTA_BANDS, JEEP_FLEET, PAGE_HEADS } from "@/lib/copy";
-import { getMedia, getSettings, getTours, pickupPoints } from "@/lib/queries";
+import { getMedia, getSettings, getTours, pickupPoints, getPageHeader } from "@/lib/queries";
 import { waLink } from "@/lib/wa";
 
 export const revalidate = 3600;
@@ -17,10 +17,10 @@ export const metadata = {
 };
 
 export default async function ToursPage() {
-  const [tours, settings, headers, cta] = await Promise.all([
+  const [tours, settings, header, cta] = await Promise.all([
     getTours(),
     getSettings(),
-    getMedia("PAGE_HEADER"),
+    getPageHeader("tours"),
     getMedia("CTA"),
   ]);
   const pickups = pickupPoints(settings);
@@ -36,7 +36,7 @@ export default async function ToursPage() {
 
   return (
     <>
-      <PageHead media={headers[1]} {...PAGE_HEADS.tours} />
+      <PageHead media={header} {...PAGE_HEADS.tours} />
 
       <section className="section">
         <div className="wrap">

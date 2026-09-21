@@ -130,6 +130,7 @@ export async function seedMedia(prisma: PrismaClient): Promise<SeedResult[]> {
           alt: item.alt,
           placement: item.placement,
           tile: item.tile ?? "",
+          pageKey: item.pageKey ?? null,
           order: item.order,
           published: true,
           roomId: roomId ?? null,

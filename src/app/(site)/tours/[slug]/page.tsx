@@ -3,7 +3,7 @@ import { PageHead } from "@/components/PageHead";
 import { TourRow } from "@/components/rows";
 import { CtaBand } from "@/components/sections";
 import { CTA_BANDS, PAGE_HEADS } from "@/lib/copy";
-import { getMedia, getSettings, getTour, getTours, pickupPoints } from "@/lib/queries";
+import { getMedia, getSettings, getTour, getTours, pickupPoints, getPageHeader } from "@/lib/queries";
 
 export const revalidate = 3600;
 
@@ -29,10 +29,10 @@ export async function generateMetadata({ params }: { params: Promise<{ slug: str
 
 export default async function TourPage({ params }: { params: Promise<{ slug: string }> }) {
   const { slug } = await params;
-  const [tour, settings, headers, cta] = await Promise.all([
+  const [tour, settings, header, cta] = await Promise.all([
     getTour(slug),
     getSettings(),
-    getMedia("PAGE_HEADER"),
+    getPageHeader("tours"),
     getMedia("CTA"),
   ]);
 
@@ -41,7 +41,7 @@ export default async function TourPage({ params }: { params: Promise<{ slug: str
   return (
     <>
       <PageHead
-        media={headers[1]}
+        media={header}
         crumb={tour.name}
         title={tour.name}
         lede={tour.shortDesc}

@@ -4,7 +4,7 @@ import { CldImage } from "@/components/CldImage";
 import { ClockIcon, JeepIcon, PhoneIcon, PinIcon, WhatsAppIcon } from "@/components/icons";
 import { CtaBand } from "@/components/sections";
 import { CONTACT_FACTS, CTA_BANDS, PAGE_HEADS } from "@/lib/copy";
-import { getMedia, getSettings } from "@/lib/queries";
+import { getMedia, getSettings, getPageHeader } from "@/lib/queries";
 import { telLink, waGeneral, waLink } from "@/lib/wa";
 
 export const revalidate = 3600;
@@ -16,16 +16,16 @@ export const metadata = {
 };
 
 export default async function ContactPage() {
-  const [settings, headers, cta] = await Promise.all([
+  const [settings, header, cta] = await Promise.all([
     getSettings(),
-    getMedia("PAGE_HEADER"),
+    getPageHeader("contact"),
     getMedia("CTA"),
   ]);
   const address = settings.address.split("\n");
 
   return (
     <>
-      <PageHead media={headers[3]} {...PAGE_HEADS.contact} />
+      <PageHead media={header} {...PAGE_HEADS.contact} />
 
       <section className="section">
         <div className="wrap">
@@ -97,8 +97,8 @@ export default async function ContactPage() {
                 style={{ marginTop: "34px", minHeight: "320px" }}
               >
                 <div className="map-fallback">
-                  {headers[3] ? (
-                    <CldImage media={headers[3]} sizes="(max-width: 900px) 100vw, 50vw" />
+                  {header ? (
+                    <CldImage media={header} sizes="(max-width: 900px) 100vw, 50vw" />
                   ) : null}
                   <div className="pin">
                     <PinIcon />

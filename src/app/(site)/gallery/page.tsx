@@ -2,7 +2,7 @@ import { Gallery } from "@/components/Gallery";
 import { PageHead } from "@/components/PageHead";
 import { CtaBand } from "@/components/sections";
 import { CTA_BANDS, PAGE_HEADS } from "@/lib/copy";
-import { getMedia, getSettings } from "@/lib/queries";
+import { getMedia, getSettings, getPageHeader } from "@/lib/queries";
 import { waAvailability } from "@/lib/wa";
 
 export const revalidate = 3600;
@@ -13,16 +13,16 @@ export const metadata = {
 };
 
 export default async function GalleryPage() {
-  const [settings, images, headers, cta] = await Promise.all([
+  const [settings, images, header, cta] = await Promise.all([
     getSettings(),
     getMedia("GALLERY"),
-    getMedia("PAGE_HEADER"),
+    getPageHeader("gallery"),
     getMedia("CTA"),
   ]);
 
   return (
     <>
-      <PageHead media={headers[2]} {...PAGE_HEADS.gallery} />
+      <PageHead media={header} {...PAGE_HEADS.gallery} />
 
       {/* With no media the whole section goes, rather than an empty grid. */}
       {images.length > 0 ? (

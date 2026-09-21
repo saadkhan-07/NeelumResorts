@@ -14,7 +14,7 @@ import { revalidateGallery, revalidateEverything } from "@/lib/revalidate";
  * BRAND placement and replace the logo.
  */
 
-const MANAGED = ["HERO", "GALLERY", "STORY", "DINING", "CTA", "PAGE_HEADER"] as const;
+const MANAGED = ["HERO", "GALLERY", "STORY", "DINING", "CTA"] as const;
 type Managed = (typeof MANAGED)[number];
 export type ManagedPlacement = Managed;
 

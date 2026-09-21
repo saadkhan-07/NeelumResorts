@@ -29,13 +29,13 @@ import {
   RATING,
   SECTIONS,
 } from "@/lib/copy";
-import { getMedia, getReviews, getRooms, getSettings, getTours } from "@/lib/queries";
+import { getMedia, getPageHeader, getReviews, getRooms, getSettings, getTours } from "@/lib/queries";
 import { telLink, waAvailability, waLink } from "@/lib/wa";
 
 export const revalidate = 3600;
 
 export default async function Home() {
-  const [rooms, tours, settings, reviews, hero, gallery, story, dining, cta, mapImages] =
+  const [rooms, tours, settings, reviews, hero, gallery, story, dining, cta, mapImage] =
     await Promise.all([
       getRooms(),
       getTours(),
@@ -46,7 +46,7 @@ export default async function Home() {
       getMedia("STORY"),
       getMedia("DINING"),
       getMedia("CTA"),
-      getMedia("PAGE_HEADER"),
+      getPageHeader("contact"),
     ]);
 
   const { whatsapp, phone, phoneDisplay, googleMapsUrl } = settings;
@@ -336,8 +336,8 @@ export default async function Home() {
             </div>
             <div className="map-card reveal is-in">
               <div className="map-fallback">
-                {mapImages[3] ? (
-                  <CldImage media={mapImages[3]} sizes="(max-width: 900px) 100vw, 50vw" />
+                {mapImage ? (
+                  <CldImage media={mapImage} sizes="(max-width: 900px) 100vw, 50vw" />
                 ) : null}
                 <div className="pin">
                   <PinIcon />
