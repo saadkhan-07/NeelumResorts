@@ -2,6 +2,7 @@ import type { Metadata } from "next";
 import { Cormorant_Garamond, Jost } from "next/font/google";
 import { faviconUrl, ogImageUrl } from "@/lib/cloudinary";
 import { getBrand, getMedia, getSettings } from "@/lib/queries";
+import { HOME_TITLE, SITE_URL } from "@/lib/site";
 
 // The marketing stylesheet is imported by `(site)/layout.tsx`, not here: /admin
 // has its own and must not inherit 128px section padding or the display face.
@@ -70,7 +71,12 @@ export async function generateMetadata(): Promise<Metadata> {
   const og = brand["og-image"]?.publicId ?? hero[0]?.publicId;
 
   return {
-    title: "Neelum Resort Taobat — Riverside Resort in Neelum Valley, Kashmir",
+    metadataBase: new URL(SITE_URL),
+    title: {
+      default: HOME_TITLE,
+      // Every page title ends with the brand — Phase 7 keyword rule.
+      template: "%s — Neelum Resort Taobat",
+    },
     description: settings.heroSub,
     icons,
     openGraph: og

@@ -1,3 +1,4 @@
+import { formatFare } from "@/lib/fares";
 import type { TourWithFares } from "@/lib/queries";
 
 /**
@@ -16,11 +17,6 @@ import type { TourWithFares } from "@/lib/queries";
  *   charge what we think you'll pay"; with the note beside it, it reads as honesty.
  */
 
-function formatFare(priceMin: number, priceMax: number | null) {
-  const min = priceMin.toLocaleString("en-PK");
-  if (priceMax == null) return `PKR ${min}`;
-  return `PKR ${min} – ${priceMax.toLocaleString("en-PK")}`;
-}
 
 /** Collects the distinct reasons on a tour's fares, so a range never stands alone. */
 function notesOf(fares: TourWithFares["fares"]) {

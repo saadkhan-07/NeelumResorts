@@ -10,6 +10,21 @@ import { revalidateEverything } from "@/lib/revalidate";
  *
  * Every value here appears on the public site, so a save purges the whole layout.
  */
+/** An optional profile link that must be on `domain` (or blank). */
+function socialLink(domain: string, name: string) {
+  return z.union([
+    z
+      .string()
+      .trim()
+      .url()
+      .refine((v) => {
+        const host = new URL(v).hostname.replace(/^www\./, "");
+        return host === domain || host.endsWith(`.${domain}`);
+      }, `That is not a ${name} link`),
+    z.literal(""),
+  ]);
+}
+
 const schema = z.object({
   // Digits only: wa.me rejects +, spaces and dashes, and the owner will type all
   // three. Cleaning it here means the website never builds a broken link.
@@ -29,9 +44,12 @@ const schema = z.object({
   // Empty is the normal state. Non-empty puts a strip across every public page.
   seasonBanner: z.string().trim().max(300),
 
-  instagram: z.union([z.string().trim().url(), z.literal("")]),
-  facebook: z.union([z.string().trim().url(), z.literal("")]),
-  tiktok: z.union([z.string().trim().url(), z.literal("")]),
+  // Each link must point at its own site. The TikTok field once held the Facebook
+  // URL, which sent the footer's TikTok icon to Facebook and gave Google the same
+  // profile twice in the schema.
+  instagram: socialLink("instagram.com", "Instagram"),
+  facebook: socialLink("facebook.com", "Facebook"),
+  tiktok: socialLink("tiktok.com", "TikTok"),
 
   // One place name per line; it populates the selector on every tour.
   pickupPoints: z.string().trim().max(2000),

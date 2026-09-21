@@ -1,5 +1,6 @@
 "use client";
 
+import { useState } from "react";
 import { WhatsAppIcon } from "./icons";
 import { saveEnquiry } from "@/app/(site)/enquiry-actions";
 import { waContact, waLink } from "@/lib/wa";
@@ -14,6 +15,10 @@ import { waContact, waLink } from "@/lib/wa";
  * Phase 6, and it goes *after* this call for the same reason.
  */
 export function ContactForm({ whatsapp }: { whatsapp: string }) {
+  // Announced to screen readers: the visible result happens in another tab, so
+  // without this a blind guest presses the button and hears nothing at all.
+  const [status, setStatus] = useState("");
+
   function onSubmit(event: React.FormEvent<HTMLFormElement>) {
     event.preventDefault();
     const data = new FormData(event.currentTarget);
@@ -28,6 +33,7 @@ export function ContactForm({ whatsapp }: { whatsapp: string }) {
       }),
     );
     window.open(url, "_blank", "noopener");
+    setStatus("WhatsApp has opened in a new tab with your details. Press send there to reach us.");
 
     // Fire-and-forget, strictly after the window is open.
     void saveEnquiry({
@@ -71,6 +77,9 @@ export function ContactForm({ whatsapp }: { whatsapp: string }) {
           <WhatsAppIcon />
           Send on WhatsApp
         </button>
+        <p className="visually-hidden" role="status" aria-live="polite">
+          {status}
+        </p>
       </div>
     </form>
   );

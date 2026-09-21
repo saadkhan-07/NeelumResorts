@@ -46,6 +46,7 @@ export function BookBar({ whatsapp, roomNames }: { whatsapp: string; roomNames: 
   const [checkout, setCheckout] = useState("");
   const [today, setToday] = useState("");
   const [error, setError] = useState<string | null>(null);
+  const [status, setStatus] = useState("");
 
   // Tomorrow → the day after, matching the reference script. Computed after mount
   // so the server and client markup agree and the page stays statically cacheable.
@@ -86,6 +87,7 @@ export function BookBar({ whatsapp, roomNames }: { whatsapp: string; roomNames: 
     const to = String(data.get("checkout") ?? "");
     if (from && to && to <= from) {
       setError("Check-out needs to be after check-in.");
+      setStatus("");
       return;
     }
     setError(null);
@@ -100,6 +102,7 @@ export function BookBar({ whatsapp, roomNames }: { whatsapp: string; roomNames: 
       }),
     );
     window.open(url, "_blank", "noopener");
+    setStatus("WhatsApp has opened in a new tab with your dates. Press send there to reach us.");
 
     void saveEnquiry({
       name: "Availability check",
@@ -172,6 +175,9 @@ export function BookBar({ whatsapp, roomNames }: { whatsapp: string; roomNames: 
             <WhatsAppIcon />
             Check on WhatsApp
           </button>
+          <p className="visually-hidden" role="status" aria-live="polite">
+            {status}
+          </p>
         </form>
       </div>
     </section>

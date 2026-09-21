@@ -1,8 +1,11 @@
+import { JsonLd } from "@/components/JsonLd";
+import { breadcrumbSchema, touristTripSchema } from "@/lib/schema";
+import { pageMetadata, withReason } from "@/lib/seo";
 import { notFound } from "next/navigation";
 import { PageHead } from "@/components/PageHead";
 import { TourRow } from "@/components/rows";
 import { CtaBand } from "@/components/sections";
-import { CTA_BANDS, PAGE_HEADS } from "@/lib/copy";
+import { CTA_BANDS, DETAIL_DESCRIPTIONS, DETAIL_LEDES } from "@/lib/copy";
 import { getMedia, getSettings, getTour, getTours, pickupPoints, getPageHeader } from "@/lib/queries";
 
 export const revalidate = 3600;
@@ -21,10 +24,17 @@ export async function generateMetadata({ params }: { params: Promise<{ slug: str
   const { slug } = await params;
   const tour = await getTour(slug);
   if (!tour) return {};
-  return {
-    title: `${tour.name} jeep tour — Neelum Resort Taobat`,
-    description: tour.shortDesc,
-  };
+  return pageMetadata({
+    path: `/tours/${tour.slug}`,
+    // The layout's title template appends the brand.
+    title: `${tour.name} Jeep Tour`,
+    description: withReason(
+      DETAIL_DESCRIPTIONS[tour.slug] ?? tour.shortDesc,
+      tour.fares.length > 0
+        ? `See the fares from ${tour.fares.map((f) => f.pickupName).join(" and ")}, then book on WhatsApp.`
+        : "Tell us where you are and we'll quote it on WhatsApp.",
+    ),
+  });
 }
 
 export default async function TourPage({ params }: { params: Promise<{ slug: string }> }) {
@@ -43,8 +53,19 @@ export default async function TourPage({ params }: { params: Promise<{ slug: str
       <PageHead
         media={header}
         crumb={tour.name}
-        title={tour.name}
-        lede={tour.shortDesc}
+        title={`${tour.name} jeep tour`}
+        lede={DETAIL_LEDES[tour.slug] ?? tour.shortDesc}
+      />
+
+      <JsonLd
+        data={touristTripSchema(tour, settings, DETAIL_LEDES[tour.slug] ?? tour.shortDesc)}
+      />
+      <JsonLd
+        data={breadcrumbSchema([
+          { name: "Home", path: "/" },
+          { name: "Jeep Tours", path: "/tours" },
+          { name: `${tour.name} jeep tour`, path: `/tours/${tour.slug}` },
+        ])}
       />
 
       <section className="section">

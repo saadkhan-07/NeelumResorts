@@ -1,7 +1,9 @@
+import { pageMetadata } from "@/lib/seo";
 import { ContactForm } from "@/components/ContactForm";
 import { PageHead } from "@/components/PageHead";
 import { CldImage } from "@/components/CldImage";
-import { ClockIcon, JeepIcon, PhoneIcon, PinIcon, WhatsAppIcon } from "@/components/icons";
+import { LazyMap } from "@/components/LazyMap";
+import { ClockIcon, JeepIcon, PhoneIcon, PinIcon, StarIcon, WhatsAppIcon } from "@/components/icons";
 import { CtaBand } from "@/components/sections";
 import { CONTACT_FACTS, CTA_BANDS, PAGE_HEADS } from "@/lib/copy";
 import { getMedia, getSettings, getPageHeader } from "@/lib/queries";
@@ -9,11 +11,14 @@ import { telLink, waGeneral, waLink } from "@/lib/wa";
 
 export const revalidate = 3600;
 
-export const metadata = {
-  title: "Contact & Directions — Neelum Resort Taobat",
-  description:
-    "Call or WhatsApp to book Neelum Resort Taobat. Directions, season dates and how to reach the last village in Neelum Valley.",
-};
+export function generateMetadata() {
+  return pageMetadata({
+    title: "Contact & Directions to Taobat",
+    description:
+      "Call or WhatsApp Neelum Resort Taobat and find the way to the last village in Neelum Valley. We answer 8 am to 11 pm, usually within the hour.",
+    path: "/contact",
+  });
+}
 
 export default async function ContactPage() {
   const [settings, header, cta] = await Promise.all([
@@ -66,6 +71,18 @@ export default async function ContactPage() {
                   </div>
                 </li>
                 <li>
+                  <StarIcon />
+                  <div>
+                    <b>Google reviews</b>
+                    <span>
+                      {/* Plain HTML, no rating schema — Phase 7. */}
+                      <a href={settings.googleMapsUrl} target="_blank" rel="noopener">
+                        {settings.ratingScore} on Google · {settings.ratingCount} reviews
+                      </a>
+                    </span>
+                  </div>
+                </li>
+                <li>
                   <PinIcon />
                   <div>
                     <b>Address</b>
@@ -106,11 +123,9 @@ export default async function ContactPage() {
                   <b>Neelum Resort Taobat</b>
                   <span>{CONTACT_FACTS.geo}</span>
                 </div>
-                <iframe
+                <LazyMap
                   title="Neelum Resort Taobat on Google Maps"
-                  loading="lazy"
-                  allowFullScreen
-                  style={{ minHeight: "320px" }}
+                  minHeight="320px"
                   src={CONTACT_FACTS.mapEmbed}
                 />
               </div>

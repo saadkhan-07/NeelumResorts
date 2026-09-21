@@ -191,14 +191,32 @@ export const JEEP_FLEET = {
    names and cities, shown on a live commercial site as real guest reviews.
    Real reviews now live in the `Review` table and are edited at /admin/reviews. */
 
-export const FAQ = [
+export type FaqItem = { q: string; a: string };
+
+export const FAQ: readonly FaqItem[] = [
   {
     q: "How do I reach Taobat?",
     a: "Taobat is the last village in Neelum Valley, about 250 km from Muzaffarabad. Most guests drive to Kel and continue the final stretch by 4x4 — the road is unpaved in places. We can arrange a jeep transfer from Kel if you tell us your arrival time in advance.",
   },
   {
-    q: "When is the best time to visit?",
+    q: "What is the best time to visit Neelum Valley?",
     a: "May to early October. The valley is green from June, the river is at its fullest in July and August, and September brings clear skies and cooler nights. The road is usually closed by snow from late November.",
+  },
+  // Phase 7: three questions Google shows under "People also ask" for searches
+  // about the valley, answered only from what our own tour pages already say.
+  // "How much is a jeep from Kel to Taobat?" is built from the fare rows in
+  // `lib/faq.ts`, so it can never disagree with the published fares.
+  {
+    q: "What is Arang Kel famous for?",
+    a: "Arang Kel is a meadow village on a shelf above Kel — green roofs, grazing horses and the whole valley below you. You reach it by jeep to Kel, then the chairlift across the river and a steep walk up through the pine. We run jeeps to Kel for it.",
+  },
+  {
+    q: "How do I reach Ratti Gali Lake?",
+    a: "Ratti Gali is reached by a jeep track from Dowarian, a long way down-valley from Taobat, so it is not a day trip from the resort. We arrange the jeep, the driver and the overnight stop — tell us where you are starting from and we'll plan it around that.",
+  },
+  {
+    q: "What is Neelum Valley famous for?",
+    a: "The Neelum River, thick pine forest, meadow villages such as Arang Kel, and alpine lakes like Ratti Gali. Taobat, where the resort is, is the last village at the top of the valley.",
   },
   {
     q: "Is there mobile signal and internet?",
@@ -260,28 +278,77 @@ export const PAGE_HEADS = {
   stays: {
     image: "hero-2.jpg",
     crumb: "Stays",
-    title: "Where you'll stay",
-    lede: "Four rooms, all timber-lined, all heated, all within earshot of the river. Message us with your dates and we'll confirm what's free.",
+    title: "Hotel rooms in Taobat, Neelum Valley",
+    lede: "Four timber-lined hotel rooms in Taobat, all heated, all within earshot of the river. Message us with your dates and we'll confirm what's free.",
   },
   tours: {
     image: "tours-header.jpg",
     crumb: "Jeep Tours",
-    title: "Jeep tours across the valley",
-    lede: "Our own 4x4s and drivers. Pick a destination, tell us where you're starting from, and we'll sort the rest.",
+    title: "Neelum Valley jeep tours",
+    lede: "Our Neelum Valley jeep tours run in our own 4x4s, with our own drivers. Pick a destination, tell us where you're starting from, and we'll sort the rest.",
   },
   gallery: {
     image: "g4.jpg",
     crumb: "Gallery",
-    title: "The valley, all year",
+    title: "Photos of Taobat and the resort",
     lede: "Taobat changes completely between May and October. These are the rooms, the river and the light our guests come back for.",
   },
   contact: {
     image: "hero-1.jpg",
     crumb: "Contact",
-    title: "Get in touch",
-    lede: "The fastest way to reach us is WhatsApp. We answer between 8:00 am and 11:00 pm, and usually within the hour.",
+    title: "Contact us and find your way to Taobat",
+    lede: "Directions to Taobat are below. The fastest way to reach us is WhatsApp — we answer between 8:00 am and 11:00 pm, and usually within the hour.",
   },
 } as const;
+
+/**
+ * The first paragraph on each room and tour page — Phase 7 puts the page's keyword
+ * there ("… in Taobat", "A jeep tour to …"). Each is the item's own short
+ * description, reworded to name the place; nothing here is a new claim. A room or
+ * tour the owner adds later has no entry and falls back to its `shortDesc`.
+ */
+export const DETAIL_LEDES: Record<string, string> = {
+  "deluxe-riverside-room":
+    "Our most booked room in Taobat: warm cedar walls a few steps from the water, and a private window seat looking straight onto the Neelum.",
+  "executive-valley-suite":
+    "The corner suite on our upper floor in Taobat, with a wooden balcony that catches the first light on the peaks.",
+  "family-hut":
+    "A family stay in Taobat with room to spread out: a standalone wooden hut with two bedrooms and its own sit-out.",
+  "riverside-cottage":
+    "The quietest corner of our resort in Taobat: a timber deck almost above the water, on the lowest terrace.",
+  "taobat-valley":
+    "A jeep tour to Taobat, the last valley on the Neelum road — river, meadows and the old wooden village, with the border ridge above it.",
+  "arang-kel":
+    "A jeep tour to Arang Kel, the meadow village on the ridge above Kel — green roofs, grazing horses and the whole valley below you.",
+  "ratti-gali-lake":
+    "A jeep tour to Ratti Gali Lake, an alpine lake ringed by snow well into summer, reached by a jeep track off the valley road.",
+  "baboon-valley":
+    "A jeep tour to Baboon Valley, off the main valley road into forest and open grazing land — green and quiet.",
+};
+
+/**
+ * Meta descriptions for room and tour pages — the snippet under the link in Google.
+ * Shorter than the ledes so the reason to click, added per page from live data
+ * (fares, or "tell us where you are"), still fits in 155 characters.
+ */
+export const DETAIL_DESCRIPTIONS: Record<string, string> = {
+  "deluxe-riverside-room":
+    "Our most booked room in Taobat: cedar walls a few steps from the Neelum, and a window seat looking onto the river.",
+  "executive-valley-suite":
+    "The corner suite on our upper floor in Taobat, with a wooden balcony that catches the first light on the peaks.",
+  "family-hut":
+    "A family stay in Taobat: a standalone wooden hut with two bedrooms and its own sit-out.",
+  "riverside-cottage":
+    "The quietest corner of our resort in Taobat, with a timber deck almost above the water.",
+  "taobat-valley":
+    "Jeep tour to Taobat, the last valley on the Neelum road, past Kel and through the pine.",
+  "arang-kel":
+    "Jeep tour to Arang Kel, the meadow village above Kel, with green roofs and the whole valley below.",
+  "ratti-gali-lake":
+    "Jeep tour to Ratti Gali Lake, an alpine lake ringed by snow well into summer.",
+  "baboon-valley":
+    "Jeep tour to Baboon Valley: forest and open grazing land off the main valley road.",
+};
 
 /** The dark band at the foot of every page. */
 export const CTA_BANDS = {

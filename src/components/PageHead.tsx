@@ -20,7 +20,12 @@ export function PageHead({
 }) {
   return (
     <section className="page-head">
-      {media ? <CldImage media={media} priority sizes="100vw" /> : null}
+      {/* The page's largest paint on a phone. It sits under a dark gradient, so a
+          lighter file (q_auto:low, and 80vw rather than full width on a phone)
+          looks the same and reaches the screen sooner on mobile data. */}
+      {media ? (
+        <CldImage media={media} priority quality={40} sizes="(max-width: 600px) 80vw, 100vw" />
+      ) : null}
       <div className="wrap">
         <p className="crumb">
           <Link href="/">Home</Link>

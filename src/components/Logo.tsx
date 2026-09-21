@@ -45,6 +45,9 @@ export function Logo({ href = "/", brand }: { href?: string; brand?: Brand }) {
               className="logo__img logo__img--light"
               src={logoUrl(lightSrc.publicId, 160)}
               alt="Neelum Resort Taobat"
+              // React preloads every <img> in the shell; at normal priority the
+              // 5 KB logo competed with the header photo, which is the LCP.
+              fetchPriority="low"
             />
           ) : null}
           {darkSrc && darkSrc.publicId !== lightSrc?.publicId ? (
@@ -53,6 +56,7 @@ export function Logo({ href = "/", brand }: { href?: string; brand?: Brand }) {
               className="logo__img logo__img--dark"
               src={logoUrl(darkSrc.publicId, 160)}
               alt=""
+              fetchPriority="low"
             />
           ) : null}
         </span>

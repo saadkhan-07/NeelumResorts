@@ -21,8 +21,8 @@ const ROW_SIZES = "(max-width: 900px) 100vw, 50vw";
  * The media column of a detail row. `PhotoStrip` shows every photograph the room
  * or tour has, falling back to a single image or the neutral block.
  */
-function RowMedia({ photos, alt }: { photos: MediaRow[]; alt: string }) {
-  return <PhotoStrip photos={photos} alt={alt} sizes={ROW_SIZES} />;
+function RowMedia({ photos, alt, defer }: { photos: MediaRow[]; alt: string; defer?: boolean }) {
+  return <PhotoStrip photos={photos} alt={alt} sizes={ROW_SIZES} defer={defer} />;
 }
 
 /**
@@ -35,10 +35,19 @@ function RowMedia({ photos, alt }: { photos: MediaRow[]; alt: string }) {
  * Note there is no price anywhere on this row — the reference shows rates only on
  * the cards, and rule 3 keeps them off by default there too.
  */
-export function RoomRow({ room, whatsapp }: { room: RoomWithPhotos; whatsapp: string }) {
+export function RoomRow({
+  room,
+  whatsapp,
+  deferMedia,
+}: {
+  room: RoomWithPhotos;
+  whatsapp: string;
+  /** Rows after the first on a list page — see PhotoStrip `defer`. */
+  deferMedia?: boolean;
+}) {
   return (
     <div className="room-row reveal is-in" id={room.slug}>
-      <RowMedia photos={room.photos} alt={room.name} />
+      <RowMedia photos={room.photos} alt={room.name} defer={deferMedia} />
       <div>
         <p className="eyebrow">{room.tagline}</p>
         <h2>{room.name}</h2>
@@ -98,15 +107,18 @@ export function TourRow({
   whatsapp,
   pickups,
   ratesUpdated,
+  deferMedia,
 }: {
   tour: TourWithFares;
   whatsapp: string;
   pickups: string[];
   ratesUpdated: string;
+  /** Rows after the first on a list page — see PhotoStrip `defer`. */
+  deferMedia?: boolean;
 }) {
   return (
     <div className="room-row reveal is-in" id={tour.slug}>
-      <RowMedia photos={tour.photos} alt={tour.name} />
+      <RowMedia photos={tour.photos} alt={tour.name} defer={deferMedia} />
       <div>
         <p className="eyebrow">{tour.tagline}</p>
         <h2>{tour.name}</h2>

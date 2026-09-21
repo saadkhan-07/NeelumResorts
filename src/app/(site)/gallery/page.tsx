@@ -1,3 +1,4 @@
+import { pageMetadata } from "@/lib/seo";
 import { Gallery } from "@/components/Gallery";
 import { PageHead } from "@/components/PageHead";
 import { CtaBand } from "@/components/sections";
@@ -7,10 +8,14 @@ import { waAvailability } from "@/lib/wa";
 
 export const revalidate = 3600;
 
-export const metadata = {
-  title: "Gallery — Neelum Resort Taobat",
-  description: "Photographs of Neelum Resort Taobat and the valley around it.",
-};
+export function generateMetadata() {
+  return pageMetadata({
+    title: "Photos of Taobat, Neelum Valley",
+    description:
+      "Photos of Neelum Resort Taobat and the valley around it: cedar rooms, the Neelum River, jeep tracks and snow. See the place before you book.",
+    path: "/gallery",
+  });
+}
 
 export default async function GalleryPage() {
   const [settings, images, header, cta] = await Promise.all([

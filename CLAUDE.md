@@ -160,3 +160,24 @@ photo.**
 - The reference has no per-room or per-tour page — `rooms.html` and `tours.html` stack every
   item as a `.room-row` with an id anchor. `/stays/[slug]` and `/tours/[slug]` render that
   same row for one item rather than inventing a second layout.
+
+## Phase 7 notes
+
+- **Keywords** are in `docs/keywords.md` (researched 21 Sep 2026, no volumes). One primary
+  keyword per page. Titles are keyword-only in each page; the layout's title template adds
+  " — Neelum Resort Taobat". `pageMetadata()` in `src/lib/seo.ts` sets canonical + Open Graph
+  for every page — use it for any new page.
+- **Canonical host is `https://www.neelumresortstaobat.com`** (`src/lib/site.ts`); the bare
+  domain 308s to it. For a local Lighthouse run build with `NEXT_PUBLIC_SITE_URL=http://localhost:3000`
+  or the canonical audit fails.
+- **Structured data** lives in `src/lib/schema.ts` and is built from the same Settings and rows
+  the page renders. **No `aggregateRating` / `review`** and no durations or distances — deliberate.
+- The FAQ answer about the Kel → Taobat jeep fare is generated from `TourFare` rows
+  (`src/lib/faq.ts`), not written in copy.
+- `global.css` now ends with a **PHASE 7 ADDENDUM** (focus ring, `.visually-hidden`, h3/h2
+  re-targets of the reference's h4 rules, `.photo-strip__placeholder`). Not part of the port.
+- Performance: header photos are `q_auto:low` (they sit under a dark wash); below-the-fold
+  photos use `DeferredImage` / PhotoStrip `defer` because Chrome's lazy threshold is ~2,500 px
+  on slow networks. `loading.tsx` exists **only** under the `[slug]` routes — at the (site)
+  level it caused a 0.44 CLS.
+- Photo alt text is data (Media.alt); the one-off fill is `prisma/data-fixes/2026-09-21-alt-text.sql`.

@@ -1,7 +1,8 @@
 "use client";
 
-import { useCallback, useEffect, useState } from "react";
+import { useCallback, useEffect, useRef, useState } from "react";
 import { CldImage, MediaPlaceholder } from "./CldImage";
+import { useDialogFocus } from "./useDialogFocus";
 import { imageUrl } from "@/lib/cloudinary";
 import type { MediaRow } from "@/lib/queries";
 
@@ -24,13 +25,52 @@ export function PhotoStrip({
   photos,
   alt,
   sizes = "(max-width: 900px) 100vw, 50vw",
+  defer = false,
 }: {
   photos: MediaRow[];
   alt: string;
   sizes?: string;
+  /**
+   * Rows further down a list page: hold the main photo back until the row is
+   * near the screen. Chrome starts `loading="lazy"` images up to 2,500 px early
+   * on a slow connection, so without this every room on /stays downloaded with
+   * the header photo and slowed the first paint.
+   */
+  defer?: boolean;
 }) {
   const [active, setActive] = useState(0);
+  const box = useRef<HTMLDivElement>(null);
+  const [near, setNear] = useState(!defer);
+  // Thumbnails are never the first thing anyone looks at; they wait for the page
+  // to finish loading so they do not compete with the header photo. Their
+  // buttons are sized by the stylesheet, so nothing moves when they fill in.
+  const [loaded, setLoaded] = useState(false);
+
+  useEffect(() => {
+    if (document.readyState === "complete") return setLoaded(true);
+    const done = () => setLoaded(true);
+    window.addEventListener("load", done, { once: true });
+    return () => window.removeEventListener("load", done);
+  }, []);
+
+  useEffect(() => {
+    if (near || !box.current) return;
+    if (!("IntersectionObserver" in window)) return setNear(true);
+    const io = new IntersectionObserver(
+      (entries) => {
+        if (entries.some((e) => e.isIntersecting)) {
+          setNear(true);
+          io.disconnect();
+        }
+      },
+      { rootMargin: "400px" },
+    );
+    io.observe(box.current);
+    return () => io.disconnect();
+  }, [near]);
   const [viewing, setViewing] = useState(false);
+  const dialog = useRef<HTMLDivElement>(null);
+  useDialogFocus(viewing, dialog);
 
   const show = useCallback(
     (n: number) => setActive(((n % photos.length) + photos.length) % photos.length),
@@ -65,8 +105,16 @@ export function PhotoStrip({
   const current = photos[active];
   const many = photos.length > 1;
 
+  // Same 4:3 box, radius and shadow as `.room-row__media img`, so the photo
+  // replaces it without shifting anything.
+  const main = near ? (
+    <CldImage media={current} intrinsic sizes={sizes} />
+  ) : (
+    <span className="photo-strip__placeholder" aria-hidden="true" />
+  );
+
   return (
-    <div className="room-row__media">
+    <div className="room-row__media" ref={box}>
       {many ? (
         <button
           type="button"
@@ -74,13 +122,13 @@ export function PhotoStrip({
           onClick={() => setViewing(true)}
           aria-label={`View ${alt} photographs full size — ${active + 1} of ${photos.length}`}
         >
-          <CldImage media={current} intrinsic sizes={sizes} />
+          {main}
           <span className="photo-strip__count" aria-hidden="true">
             {active + 1} / {photos.length}
           </span>
         </button>
       ) : (
-        <CldImage media={current} intrinsic sizes={sizes} />
+        main
       )}
 
       {many ? (
@@ -95,8 +143,10 @@ export function PhotoStrip({
               className={n === active ? "is-active" : undefined}
               onClick={() => setActive(n)}
             >
-              {/* eslint-disable-next-line @next/next/no-img-element */}
-              <img src={imageUrl(photo.publicId, 200)} alt="" loading="lazy" />
+              {loaded && near ? (
+                // eslint-disable-next-line @next/next/no-img-element
+                <img src={imageUrl(photo.publicId, 200)} alt="" loading="lazy" />
+              ) : null}
             </button>
           ))}
         </div>
@@ -104,6 +154,7 @@ export function PhotoStrip({
 
       {viewing ? (
         <div
+          ref={dialog}
           className="lightbox is-open"
           role="dialog"
           aria-modal="true"

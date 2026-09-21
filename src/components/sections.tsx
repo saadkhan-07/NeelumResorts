@@ -1,6 +1,7 @@
 import { CldImage } from "./CldImage";
+import { DeferredImage } from "./DeferredImage";
 import { ICONS, WhatsAppIcon, type IconName } from "./icons";
-import { FAQ, RATING, STATS } from "@/lib/copy";
+import { RATING, STATS, type FaqItem } from "@/lib/copy";
 import type { MediaRow, ReviewRow } from "@/lib/queries";
 import { telLink, waLink } from "@/lib/wa";
 
@@ -31,7 +32,8 @@ export function CtaBand({
 }) {
   return (
     <section className="cta-band">
-      {media ? <CldImage media={media} sizes="100vw" /> : null}
+      {/* Always at the foot of the page, so never needed for the first paint. */}
+      {media ? <DeferredImage media={media} sizes="100vw" /> : null}
       <div className="wrap">
         {eyebrow ? (
           <p
@@ -78,7 +80,7 @@ export function FeatureGrid({
         return (
           <div className="feature reveal is-in" key={item.title}>
             {Icon ? <Icon /> : null}
-            <h4>{item.title}</h4>
+            <h3>{item.title}</h3>
             <p>{item.body}</p>
           </div>
         );
@@ -88,10 +90,10 @@ export function FeatureGrid({
 }
 
 /** Native `<details>`, as specified — no accordion library, no JavaScript. */
-export function Faq() {
+export function Faq({ items }: { items: FaqItem[] }) {
   return (
     <div className="faq">
-      {FAQ.map((item) => (
+      {items.map((item) => (
         <details key={item.q}>
           <summary>{item.q}</summary>
           <p>{item.a}</p>

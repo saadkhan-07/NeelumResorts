@@ -15,6 +15,7 @@ export function CldImage({
   priority,
   intrinsic,
   className,
+  quality,
 }: {
   media: Pick<MediaRow, "publicId" | "alt" | "width" | "height">;
   sizes?: string;
@@ -22,6 +23,8 @@ export function CldImage({
   /** Render at the media's own dimensions instead of filling the parent. */
   intrinsic?: boolean;
   className?: string;
+  /** 40 or below asks for q_auto:low — see cloudinary-loader.ts. */
+  quality?: number;
 }) {
   if (intrinsic) {
     return (
@@ -32,6 +35,9 @@ export function CldImage({
         height={media.height}
         sizes={sizes}
         priority={priority}
+        // Next copies this onto the <link rel=preload> only when it is passed
+        // explicitly; without it the LCP photo was preloaded at normal priority.
+        fetchPriority={priority ? "high" : undefined}
         className={className}
         // The stylesheet sets width:100% + aspect-ratio; without height:auto the
         // HTML height attribute stays definite and the aspect-ratio is ignored.
@@ -46,7 +52,10 @@ export function CldImage({
       alt={media.alt}
       fill
       sizes={sizes}
+      quality={quality}
       priority={priority}
+      // See above: this is what puts fetchpriority=high on the preload.
+      fetchPriority={priority ? "high" : undefined}
       className={className}
       style={{ objectFit: "cover" }}
     />

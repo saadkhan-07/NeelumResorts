@@ -1,3 +1,4 @@
+import { pageMetadata } from "@/lib/seo";
 import { PageHead } from "@/components/PageHead";
 import { CldImage } from "@/components/CldImage";
 import { Steps } from "@/components/Steps";
@@ -10,11 +11,14 @@ import { waLink } from "@/lib/wa";
 
 export const revalidate = 3600;
 
-export const metadata = {
-  title: "Jeep Tours — Neelum Resort Taobat",
-  description:
-    "Guided 4x4 jeep tours across Neelum Valley — Taobat Valley, Arang Kel, Ratti Gali and Baboon Valley. Published fares for our regular routes, a same-day quote from anywhere else.",
-};
+export function generateMetadata() {
+  return pageMetadata({
+    title: "Neelum Valley Jeep Tours",
+    description:
+      "Jeep tours to Taobat, Arang Kel, Ratti Gali Lake and Baboon Valley in our own 4x4s with local drivers. See the routes and fares, then book on WhatsApp.",
+    path: "/tours",
+  });
+}
 
 export default async function ToursPage() {
   const [tours, settings, header, cta] = await Promise.all([
@@ -40,14 +44,15 @@ export default async function ToursPage() {
 
       <section className="section">
         <div className="wrap">
-          <Steps />
-          {tours.map((tour) => (
+          <Steps level={2} />
+          {tours.map((tour, i) => (
             <TourRow
               key={tour.id}
               tour={tour}
               whatsapp={settings.whatsapp}
               pickups={pickups}
               ratesUpdated={settings.ratesUpdated}
+              deferMedia={i > 0}
             />
           ))}
         </div>

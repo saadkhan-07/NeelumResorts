@@ -24,7 +24,10 @@ export default function cloudinaryImageLoader({
   // difference at the sizes they render — and the homepage budget is 1.2 MB for
   // the whole scroll, not just the hero. Anything that needs more can pass an
   // explicit `quality`.
-  const q = quality ? `q_${quality}` : "q_auto:eco";
+  // `quality={40}` or below means "behind a dark wash" — the page-head photo sits
+  // under a 30–85% gradient — and asks Cloudinary for q_auto:low instead of a
+  // fixed number, so it still adapts to each photo.
+  const q = !quality ? "q_auto:eco" : quality <= 40 ? "q_auto:low" : `q_${quality}`;
   // c_limit never enlarges past the source, so a small upload is not upscaled.
   return `https://res.cloudinary.com/${cloud}/image/upload/f_auto,${q},c_limit,w_${width}/${src}`;
 }

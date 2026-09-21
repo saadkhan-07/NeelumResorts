@@ -1,3 +1,4 @@
+import { pageMetadata } from "@/lib/seo";
 import { PageHead } from "@/components/PageHead";
 import { RoomRow } from "@/components/rows";
 import { CtaBand, FeatureGrid } from "@/components/sections";
@@ -8,11 +9,14 @@ import Link from "next/link";
 
 export const revalidate = 3600;
 
-export const metadata = {
-  title: "Our Stays — Neelum Resort Taobat",
-  description:
-    "Four timber rooms on the riverbank in Taobat, Neelum Valley — deluxe rooms, a valley suite, a family hut and a riverside cottage.",
-};
+export function generateMetadata() {
+  return pageMetadata({
+    title: "Hotel Rooms in Taobat, Neelum Valley",
+    description:
+      "Four heated cedar rooms on the Neelum riverbank in Taobat, each with an attached bathroom and hot water. See every room and check your dates.",
+    path: "/stays",
+  });
+}
 
 export default async function StaysPage() {
   const [rooms, settings, header, cta] = await Promise.all([
@@ -28,8 +32,8 @@ export default async function StaysPage() {
 
       <section className="section">
         <div className="wrap">
-          {rooms.map((room) => (
-            <RoomRow key={room.id} room={room} whatsapp={settings.whatsapp} />
+          {rooms.map((room, i) => (
+            <RoomRow key={room.id} room={room} whatsapp={settings.whatsapp} deferMedia={i > 0} />
           ))}
         </div>
       </section>

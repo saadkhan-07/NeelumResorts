@@ -1,7 +1,13 @@
 "use client";
 
-import { useCallback, useEffect, useState } from "react";
+import { useCallback, useEffect, useRef, useState } from "react";
 import { CldImage } from "./CldImage";
+import { DeferredImage } from "./DeferredImage";
+import { useDialogFocus } from "./useDialogFocus";
+
+const TILE_SIZES = "(max-width: 560px) 44vw, (max-width: 900px) 48vw, 25vw";
+/** Tiles that may be in the first screenful on a phone or a laptop. */
+const EAGER_TILES = 4;
 import { imageUrl } from "@/lib/cloudinary";
 import type { MediaRow } from "@/lib/queries";
 
@@ -14,6 +20,8 @@ import type { MediaRow } from "@/lib/queries";
  */
 export function Gallery({ images }: { images: MediaRow[] }) {
   const [open, setOpen] = useState<number | null>(null);
+  const dialog = useRef<HTMLDivElement>(null);
+  useDialogFocus(open !== null, dialog);
 
   const show = useCallback(
     (n: number) => setOpen(((n % images.length) + images.length) % images.length),
@@ -51,22 +59,29 @@ export function Gallery({ images }: { images: MediaRow[] }) {
             key={image.id}
             className={image.tile || undefined}
             href={imageUrl(image.publicId, 1600)}
+            aria-label={`${image.alt || "Photo"} — open full size`}
             onClick={(e) => {
               e.preventDefault();
               show(n);
             }}
           >
-            <CldImage media={image} sizes="(max-width: 560px) 44vw, (max-width: 900px) 48vw, 25vw" />
+            {/* The first rows can be on screen at load; the rest wait until near. */}
+            {n < EAGER_TILES ? (
+              <CldImage media={image} sizes={TILE_SIZES} />
+            ) : (
+              <DeferredImage media={image} sizes={TILE_SIZES} />
+            )}
           </a>
         ))}
       </div>
 
       {current ? (
         <div
+          ref={dialog}
           className="lightbox is-open"
           role="dialog"
           aria-modal="true"
-          aria-label={current.alt}
+          aria-label={`Photo ${open! + 1} of ${images.length}: ${current.alt}`}
           onClick={(e) => {
             if (e.target === e.currentTarget) close();
           }}

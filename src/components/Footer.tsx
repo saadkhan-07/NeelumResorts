@@ -62,7 +62,7 @@ export function Footer({ settings, brand }: { settings: Settings; brand?: Brand 
           </div>
 
           <div>
-            <h4>Explore</h4>
+            <h3>Explore</h3>
             <ul className="footer-links">
               {EXPLORE.map((link) => (
                 <li key={link.label}>
@@ -73,7 +73,7 @@ export function Footer({ settings, brand }: { settings: Settings; brand?: Brand 
           </div>
 
           <div>
-            <h4>Good to know</h4>
+            <h3>Good to know</h3>
             <ul className="footer-links">
               {GOOD_TO_KNOW.map((link) => (
                 <li key={link.label}>
@@ -84,7 +84,7 @@ export function Footer({ settings, brand }: { settings: Settings; brand?: Brand 
           </div>
 
           <div>
-            <h4>Reach us</h4>
+            <h3>Reach us</h3>
             <ul className="footer-links">
               <li>
                 <a href={telLink(settings.phone)}>{settings.phoneDisplay}</a>

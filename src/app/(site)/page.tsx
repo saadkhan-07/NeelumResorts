@@ -1,8 +1,11 @@
+import { pageMetadata } from "@/lib/seo";
+import { HOME_TITLE } from "@/lib/site";
 import Link from "next/link";
 import { BookBar } from "@/components/BookBar";
 import { Gallery } from "@/components/Gallery";
 import { HeroSlider } from "@/components/HeroSlider";
 import { CldImage } from "@/components/CldImage";
+import { LazyMap } from "@/components/LazyMap";
 import { Steps } from "@/components/Steps";
 import { RoomCard, TourCard } from "@/components/cards";
 import {
@@ -23,16 +26,29 @@ import {
   Stats,
 } from "@/components/sections";
 import {
+  CONTACT_FACTS,
   CTA_BANDS,
   EXPERIENCES,
   LOCATION_FACTS,
   RATING,
   SECTIONS,
 } from "@/lib/copy";
+import { JsonLd } from "@/components/JsonLd";
+import { buildFaq } from "@/lib/faq";
+import { hotelSchema } from "@/lib/schema";
 import { getMedia, getPageHeader, getReviews, getRooms, getSettings, getTours } from "@/lib/queries";
 import { telLink, waAvailability, waLink } from "@/lib/wa";
 
 export const revalidate = 3600;
+
+export function generateMetadata() {
+  return pageMetadata({
+    absoluteTitle: HOME_TITLE,
+    description:
+      "A riverside resort in Taobat, the last village in Neelum Valley, Azad Kashmir: cedar rooms, river trout and jeep tours. Check your dates on WhatsApp.",
+    path: "/",
+  });
+}
 
 export default async function Home() {
   const [rooms, tours, settings, reviews, hero, gallery, story, dining, cta, mapImage] =
@@ -50,6 +66,7 @@ export default async function Home() {
     ]);
 
   const { whatsapp, phone, phoneDisplay, googleMapsUrl } = settings;
+  const faq = buildFaq(tours);
   const headline = settings.heroHeadline.split(/\*(.+?)\*/);
 
   return (
@@ -64,10 +81,18 @@ export default async function Home() {
         <HeroSlider slides={hero} />
         <div className="hero__inner">
           <div className="wrap">
-            <span className="hero__rating">
-              <span className="stars">★★★★★</span>
+            {/* Plain HTML, no rating schema — Phase 7. A link to the reviews on the
+                Google profile, so the number can be checked where it lives. */}
+            <a
+              className="hero__rating"
+              href={googleMapsUrl}
+              target="_blank"
+              rel="noopener"
+              aria-label={`Rated ${settings.ratingScore} out of 5 on Google from ${settings.ratingCount} reviews — read them on Google Maps`}
+            >
+              <span className="stars" aria-hidden="true">★★★★★</span>
               <b>{settings.ratingScore}</b> · {settings.ratingCount} Google reviews
-            </span>
+            </a>
             <h1>
               {/* `heroHeadline` marks its emphasised word with *asterisks* so the
                   owner never has to type markup and we never render theirs as HTML. */}
@@ -91,6 +116,8 @@ export default async function Home() {
           </div>
         </div>
       </section>
+
+      <JsonLd data={hotelSchema(settings, hero)} />
 
       {/* ============ BOOKING BAR ============ */}
       <BookBar whatsapp={whatsapp} roomNames={rooms.map((room) => room.name)} />
@@ -345,11 +372,9 @@ export default async function Home() {
                 <b>Neelum Resort Taobat</b>
                 <span>34.7247°N, 74.7096°E · PPF5+VR</span>
               </div>
-              <iframe
+              <LazyMap
                 title="Neelum Resort Taobat on Google Maps"
-                loading="lazy"
-                allowFullScreen
-                src="https://maps.google.com/maps?q=34.7247131,74.7096112&z=13&output=embed"
+                src={CONTACT_FACTS.mapEmbed}
               />
             </div>
           </div>
@@ -363,8 +388,19 @@ export default async function Home() {
             <p className="eyebrow eyebrow--center">{SECTIONS.faq.eyebrow}</p>
             <h2>{SECTIONS.faq.title}</h2>
           </div>
-          <Faq />
+          <Faq items={faq} />
         </div>
+        <JsonLd
+          data={{
+            "@context": "https://schema.org",
+            "@type": "FAQPage",
+            mainEntity: faq.map((item) => ({
+              "@type": "Question",
+              name: item.q,
+              acceptedAnswer: { "@type": "Answer", text: item.a },
+            })),
+          }}
+        />
       </section>
 
       {/* ============ CTA ============ */}

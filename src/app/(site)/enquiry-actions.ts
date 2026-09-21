@@ -1,7 +1,9 @@
 "use server";
 
+import { headers } from "next/headers";
 import { z } from "zod";
 import { prisma } from "@/lib/db";
+import { allow, clientIp } from "@/lib/rate-limit";
 
 /**
  * Records a guest enquiry — rule 1: the row in the database is the *only* record
@@ -57,7 +59,18 @@ function asDate(value?: string) {
   return Number.isNaN(d.getTime()) ? null : d;
 }
 
+/**
+ * Ten enquiries per address per ten minutes. A real guest tapping through every
+ * room and tour card stays well inside it; a script filling the owner's inbox
+ * does not. Over the limit the row is simply not written — the guest has already
+ * reached WhatsApp, which is the part that matters.
+ */
+const LIMIT = 10;
+const WINDOW_MS = 10 * 60 * 1000;
+
 export async function saveEnquiry(input: EnquiryInput): Promise<{ ok: boolean }> {
+  if (!allow(`enquiry:${clientIp(await headers())}`, LIMIT, WINDOW_MS)) return { ok: false };
+
   const parsed = schema.safeParse(input);
   if (!parsed.success) return { ok: false };
 

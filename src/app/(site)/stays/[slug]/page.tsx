@@ -1,8 +1,11 @@
+import { JsonLd } from "@/components/JsonLd";
+import { breadcrumbSchema } from "@/lib/schema";
+import { pageMetadata, withReason } from "@/lib/seo";
 import { notFound } from "next/navigation";
 import { PageHead } from "@/components/PageHead";
 import { RoomRow } from "@/components/rows";
 import { CtaBand } from "@/components/sections";
-import { CTA_BANDS, PAGE_HEADS } from "@/lib/copy";
+import { CTA_BANDS, DETAIL_DESCRIPTIONS, DETAIL_LEDES } from "@/lib/copy";
 import { getMedia, getRoom, getRooms, getSettings, getPageHeader } from "@/lib/queries";
 import { waRoom } from "@/lib/wa";
 
@@ -22,10 +25,12 @@ export async function generateMetadata({ params }: { params: Promise<{ slug: str
   const { slug } = await params;
   const room = await getRoom(slug);
   if (!room) return {};
-  return {
-    title: `${room.name} — Neelum Resort Taobat`,
-    description: room.shortDesc,
-  };
+  return pageMetadata({
+    path: `/stays/${room.slug}`,
+    // The layout's title template appends the brand.
+    title: room.slug === "family-hut" ? `${room.name}, a Family Stay in Taobat` : `${room.name} in Taobat`,
+    description: withReason(DETAIL_DESCRIPTIONS[room.slug] ?? room.shortDesc, "Check your dates on WhatsApp."),
+  });
 }
 
 export default async function RoomPage({ params }: { params: Promise<{ slug: string }> }) {
@@ -44,8 +49,16 @@ export default async function RoomPage({ params }: { params: Promise<{ slug: str
       <PageHead
         media={header}
         crumb={room.name}
-        title={room.name}
-        lede={room.shortDesc}
+        title={`${room.name} in Taobat`}
+        lede={DETAIL_LEDES[room.slug] ?? room.shortDesc}
+      />
+
+      <JsonLd
+        data={breadcrumbSchema([
+          { name: "Home", path: "/" },
+          { name: "Stays", path: "/stays" },
+          { name: room.name, path: `/stays/${room.slug}` },
+        ])}
       />
 
       <section className="section">
