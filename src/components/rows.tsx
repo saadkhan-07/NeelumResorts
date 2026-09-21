@@ -1,6 +1,7 @@
 import { FareListDetail } from "./FareList";
 import { PickupSelect } from "./PickupSelect";
 import { PhotoStrip } from "./PhotoStrip";
+import { PriceTag } from "./PriceTag";
 import {
   BedIcon,
   CheckIcon,
@@ -32,8 +33,10 @@ function RowMedia({ photos, alt, defer }: { photos: MediaRow[]; alt: string; def
  * `id` anchors. `/stays/[slug]` in PROMPT.md § 8 therefore renders this same row on
  * a page of its own rather than inventing a second layout.
  *
- * Note there is no price anywhere on this row — the reference shows rates only on
- * the cards, and rule 3 keeps them off by default there too.
+ * The price follows the same switch as the cards (rule 3): with `showPrice` on and a
+ * price set it sits beside "Check availability"; otherwise nothing is shown, which
+ * is exactly the reference row. It was once left off rows entirely, so turning the
+ * switch on changed the homepage cards but not /stays — the page a guest reads.
  */
 export function RoomRow({
   room,
@@ -90,6 +93,7 @@ export function RoomRow({
             <WhatsAppIcon />
             Check availability
           </a>
+          {room.showPrice && room.price != null ? <PriceTag room={room} /> : null}
         </div>
       </div>
     </div>
