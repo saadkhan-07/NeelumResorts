@@ -93,7 +93,7 @@ export function RoomRow({
             <WhatsAppIcon />
             Check availability
           </a>
-          {room.showPrice && room.price != null ? <PriceTag room={room} /> : null}
+          {room.showPrice && room.price != null ? <PriceTag room={room} variant="row" /> : null}
         </div>
       </div>
     </div>

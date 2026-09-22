@@ -47,7 +47,7 @@ export function FareListCard({ tour }: { tour: TourWithFares }) {
       {shown.map((fare) => (
         <span key={fare.id}>
           <i>{fare.pickupName}</i>
-          {formatFare(fare.priceMin, fare.priceMax)}
+          <b>{formatFare(fare.priceMin, fare.priceMax)}</b>
         </span>
       ))}
       <small>
@@ -83,22 +83,25 @@ export function FareListDetail({
 
   return (
     <>
-      <table className="fare-table">
-        <thead>
-          <tr>
-            <th>Pick-up from</th>
-            <th style={{ textAlign: "right" }}>Per jeep, up to 6</th>
-          </tr>
-        </thead>
-        <tbody>
-          {tour.fares.map((fare) => (
-            <tr key={fare.id}>
-              <td>{fare.pickupName}</td>
-              <td>{formatFare(fare.priceMin, fare.priceMax)}</td>
+      <div className="fare-panel">
+        <p className="fare-panel__title">Jeep fares</p>
+        <table className="fare-table">
+          <thead>
+            <tr>
+              <th>Pick-up from</th>
+              <th style={{ textAlign: "right" }}>Per jeep, up to 6</th>
             </tr>
-          ))}
-        </tbody>
-      </table>
+          </thead>
+          <tbody>
+            {tour.fares.map((fare) => (
+              <tr key={fare.id}>
+                <td>{fare.pickupName}</td>
+                <td>{formatFare(fare.priceMin, fare.priceMax)}</td>
+              </tr>
+            ))}
+          </tbody>
+        </table>
+      </div>
       <p className="rates-note">
         {notes.join(" · ")}
         {notes.length > 0 && ratesUpdated ? " · " : null}
