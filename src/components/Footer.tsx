@@ -117,8 +117,7 @@ export function Footer({ settings, brand }: { settings: Settings; brand?: Brand 
 
         <div className="footer-bottom">
           <span>
-            &copy; {new Date().getFullYear()} Neelum Resort Taobat. All rights
-            reserved.
+            Neelum Resort Taobat, Established in 2020, All Rights Reserved
           </span>
           <span>Privacy Policy · Terms &amp; Conditions</span>
         </div>
