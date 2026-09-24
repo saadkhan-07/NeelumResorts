@@ -73,7 +73,7 @@ export function Header({ solid, whatsapp, brand }: HeaderProps) {
           </button>
         </div>
       </header>
-      <MobileNav open={menuOpen} onClose={() => setMenuOpen(false)} whatsapp={whatsapp} />
+      <MobileNav open={menuOpen} onClose={() => setMenuOpen(false)} whatsapp={whatsapp} brand={brand} />
     </>
   );
 }

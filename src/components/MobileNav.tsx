@@ -3,14 +3,16 @@
 import { useEffect, useRef } from "react";
 import Link from "next/link";
 import { Button } from "./Button";
-import { LogoMark } from "./icons";
+import { logoUrl } from "@/lib/cloudinary";
 import { NAV_LINKS } from "@/lib/nav";
+import type { Brand } from "@/lib/queries";
 import { waBooking } from "@/lib/wa";
 
 type MobileNavProps = {
   open: boolean;
   onClose: () => void;
   whatsapp: string;
+  brand?: Brand;
 };
 
 /**
@@ -32,8 +34,10 @@ type MobileNavProps = {
  *    have accidentally scrolled somewhere else;
  *  - `prefers-reduced-motion` drops the slide.
  */
-export function MobileNav({ open, onClose, whatsapp }: MobileNavProps) {
+export function MobileNav({ open, onClose, whatsapp, brand }: MobileNavProps) {
   const panel = useRef<HTMLDivElement>(null);
+  // The drawer is pine, so the light mark, falling back as the header's does.
+  const logo = brand?.["logo-light"] ?? brand?.["logo-dark"] ?? null;
   const returnFocus = useRef<HTMLElement | null>(null);
 
   useEffect(() => {
@@ -107,7 +111,19 @@ export function MobileNav({ open, onClose, whatsapp }: MobileNavProps) {
       >
         <div className="mobile-nav__head">
           <span className="mobile-nav__brand">
-            <LogoMark />
+            {logo ? (
+              /* eslint-disable-next-line @next/next/no-img-element */
+              <img
+                className="mobile-nav__logo"
+                src={logoUrl(logo.publicId, 160)}
+                alt="Neelum Resort Taobat"
+                // The upload's own proportions, so the box is right before it loads.
+                width={Math.round((42 * logo.width) / logo.height)}
+                height="42"
+                // Same URL as the header's logo, so it is already in the cache.
+                fetchPriority="low"
+              />
+            ) : null}
             <span>
               <b>Neelum Resort</b>
               <small>Taobat · Neelum Valley</small>

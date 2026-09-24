@@ -644,7 +644,8 @@ body:has(.season-banner) .site-header{top:var(--banner-h,38px)}
   border-bottom:1px solid rgba(255,255,255,.12);
 }
 .mobile-nav__brand{display:flex;align-items:center;gap:11px;color:#fff;min-width:0}
-.mobile-nav__brand svg{width:30px;height:30px;flex:none}
+/* the header's mobile logo size: 42px tall, 150px at most for a wordmark */
+.mobile-nav__logo{height:42px;width:auto;max-width:150px;object-fit:contain;display:block;flex-shrink:0}
 .mobile-nav__brand b{
   display:block;font-family:var(--ff-display);font-size:1.02rem;
   font-weight:500;line-height:1.15;letter-spacing:.02em;
