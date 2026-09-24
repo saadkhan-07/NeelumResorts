@@ -51,13 +51,18 @@ export function Gallery({ images }: { images: MediaRow[] }) {
 
   const current = open === null ? null : images[open];
 
+  // On a phone the grid is two columns: tall and wide tiles take two cells, the
+  // rest one. An odd total leaves a hole, so the last plain tile spans the row.
+  const cells = images.reduce((sum, image) => sum + (image.tile ? 2 : 1), 0);
+  const fullTile = cells % 2 ? images.map((image) => !image.tile).lastIndexOf(true) : -1;
+
   return (
     <>
       <div className="gallery">
         {images.map((image, n) => (
           <a
             key={image.id}
-            className={image.tile || undefined}
+            className={[image.tile, n === fullTile && "mobile-full"].filter(Boolean).join(" ") || undefined}
             href={imageUrl(image.publicId, 1600)}
             aria-label={`${image.alt || "Photo"} — open full size`}
             onClick={(e) => {
