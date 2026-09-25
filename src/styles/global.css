@@ -514,9 +514,13 @@ p:last-child{margin-bottom:0}
       image already carries it. A square emblem keeps the text.
    ========================================================= */
 .logo__mark{
-  display:block;flex:none;position:relative;
+  display:block;flex:0 0 auto;position:relative;
   /* generous over the hero, tightened once the bar compacts on scroll */
-  height:48px;width:auto;aspect-ratio:auto;
+  height:48px;width:auto;
+  /* When both marks are stacked they are position:absolute, so nothing inside
+     gives the box a width and the text slides under the logo. The ratio does.
+     Logo.tsx overrides it inline with the upload's own proportions. */
+  aspect-ratio:1 / 1;
   transition:height .45s var(--ease);
 }
 .logo__img{

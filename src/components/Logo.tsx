@@ -38,7 +38,7 @@ export function Logo({ href = "/", brand }: { href?: string; brand?: Brand }) {
   return (
     <Link className={isWordmark ? "logo logo--wordmark" : "logo"} href={href}>
       {lightSrc || darkSrc ? (
-        <span className="logo__mark">
+        <span className="logo__mark" style={shape ? { aspectRatio: `${shape.width} / ${shape.height}` } : undefined}>
           {lightSrc ? (
             /* eslint-disable-next-line @next/next/no-img-element */
             <img
