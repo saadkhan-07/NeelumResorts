@@ -6,11 +6,12 @@ import {
   DashboardIcon,
   EnquiryIcon,
   GalleryIcon,
-  LogoMark,
   RoomIcon,
   SettingsIcon,
   TourIcon,
 } from "./icons";
+import { AdminLogo } from "./AdminLogo";
+import type { Brand } from "@/lib/queries";
 
 /**
  * One list of destinations, rendered twice: as a sidebar on desktop and as a
@@ -57,17 +58,19 @@ export function AdminSidebar({
   newEnquiries,
   name,
   email,
+  brand,
 }: {
   newEnquiries: number;
   name: string;
   email: string;
+  brand: Brand;
 }) {
   const isActive = useActive();
 
   return (
     <nav className="admin-side" aria-label="Admin sections">
       <div className="admin-brand">
-        <LogoMark />
+        <AdminLogo brand={brand} on="dark" height={36} />
         <span>
           <b>Neelum Resort</b>
           <span>Admin</span>

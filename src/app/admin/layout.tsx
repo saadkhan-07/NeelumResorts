@@ -6,6 +6,7 @@ import { AdminSidebar, AdminTabs } from "@/components/admin/Nav";
 import { SignOutButton } from "@/components/admin/SignOutButton";
 import { SettingsIcon } from "@/components/admin/icons";
 import { countNewEnquiries } from "@/lib/admin-queries";
+import { getBrand } from "@/lib/queries";
 
 export const metadata: Metadata = {
   title: "Admin — Neelum Resort Taobat",
@@ -26,14 +27,14 @@ export default async function AdminLayout({
     return <div className="admin">{children}</div>;
   }
 
-  const newEnquiries = await countNewEnquiries();
+  const [newEnquiries, brand] = await Promise.all([countNewEnquiries(), getBrand()]);
   const name = session.user.name ?? "Admin";
   const email = session.user.email ?? "";
 
   return (
     <div className="admin">
       <div className="admin-shell">
-        <AdminSidebar newEnquiries={newEnquiries} name={name} email={email} />
+        <AdminSidebar newEnquiries={newEnquiries} name={name} email={email} brand={brand} />
 
         <div>
           <header className="admin-topbar">

@@ -1,4 +1,5 @@
-import { LogoMark } from "@/components/admin/icons";
+import { AdminLogo } from "@/components/admin/AdminLogo";
+import { getBrand } from "@/lib/queries";
 import { LoginForm } from "./LoginForm";
 
 export const dynamic = "force-dynamic";
@@ -13,15 +14,13 @@ export default async function LoginPage({
 }: {
   searchParams: Promise<{ callbackUrl?: string }>;
 }) {
-  const { callbackUrl } = await searchParams;
+  const [{ callbackUrl }, brand] = await Promise.all([searchParams, getBrand()]);
 
   return (
     <div className="admin-login">
       <div className="admin-login-card">
         <div style={{ display: "flex", alignItems: "center", gap: 10, marginBottom: 16, color: "#1D352D" }}>
-          <span style={{ width: 30, height: 30, display: "block" }}>
-            <LogoMark />
-          </span>
+          <AdminLogo brand={brand} on="light" height={44} />
           <b style={{ fontSize: ".82rem", letterSpacing: ".14em", textTransform: "uppercase" }}>
             Neelum Resort
           </b>
