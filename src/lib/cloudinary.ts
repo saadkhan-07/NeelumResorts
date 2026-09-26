@@ -30,12 +30,12 @@ export function imageUrl(publicId: string, width: number) {
 }
 
 /**
- * A 9:16 portrait crop for the phone hero, where a landscape photo under
- * `object-fit: cover` would show only its middle third, scaled up ~3x.
- * `g_auto` keeps the subject in frame rather than the geometric centre.
+ * The phone hero's background loop. One H.264 MP4 and nothing else — every
+ * phone plays it, so there is no WebM to pick between. `ac_none` strips the audio
+ * track the video never uses; 720 wide is a full-screen 9:16 phone.
  */
-export function portraitUrl(publicId: string, width: number) {
-  return `${base("image")}/f_auto,q_auto:good,c_fill,g_auto,ar_9:16,w_${width}/${publicId}`;
+export function heroVideoUrl(publicId: string) {
+  return `${base("video")}/f_mp4,vc_h264,q_auto:low,ac_none,w_720/${publicId}.mp4`;
 }
 
 /** Same, without the crop — for images whose own aspect ratio must survive. */

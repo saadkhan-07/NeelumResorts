@@ -384,9 +384,6 @@ p:last-child{margin-bottom:0}
   .room-row:nth-child(even) .room-row__media{order:0}
   .split__badge{right:16px;bottom:16px}
   .stats{grid-template-columns:1fr 1fr;gap:32px 16px}
-  /* The phone hero is already a close portrait crop; the ken-burns zoom on top of
-     it read as blur. */
-  .hero__slide img{transform:none;animation:none}
   .gallery{grid-template-columns:repeat(2,1fr);grid-auto-rows:150px;grid-auto-flow:dense}
   .gallery .wide{grid-column:span 2}
   /* Mobile: keep total cells even (tall/wide = 2, normal = 1); if odd, put .mobile-full on the last tile. */
@@ -860,4 +857,17 @@ a.hero__rating:hover{background:rgba(255,255,255,.18)}
 .fare-panel .fare-table td{font-size:1rem}
 .fare-panel .fare-table td:last-child{
   font-family:var(--ff-display);font-size:1.28rem;color:var(--ink);
+}
+
+/* =========================================================================
+   HERO VIDEO ADDENDUM — 26 Sep 2026. Not part of the reference port.
+   Phones (≤900px) get a looping 9:16 video in place of the photo slider
+   (HeroMobileVideo). It sits in the same layer as .hero__slides, so the
+   .hero::after wash and the hero text stay on top. Desktop is untouched.
+   ========================================================================= */
+.hero__video{display:none}
+@media (max-width:900px){
+  .hero__slides,.hero__dots{display:none}
+  .hero__video{display:block;position:absolute;inset:0}
+  .hero__video img,.hero__video video{position:absolute;inset:0;width:100%;height:100%;object-fit:cover}
 }

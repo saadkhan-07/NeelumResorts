@@ -3,6 +3,7 @@ import { HOME_TITLE } from "@/lib/site";
 import Link from "next/link";
 import { BookBar } from "@/components/BookBar";
 import { Gallery } from "@/components/Gallery";
+import { HeroMobileVideo } from "@/components/HeroMobileVideo";
 import { HeroSlider } from "@/components/HeroSlider";
 import { CldImage } from "@/components/CldImage";
 import { LazyMap } from "@/components/LazyMap";
@@ -79,6 +80,7 @@ export default async function Home() {
         style={hero.length === 0 ? { background: "var(--pine)" } : undefined}
       >
         <HeroSlider slides={hero} />
+        <HeroMobileVideo />
         <div className="hero__inner">
           <div className="wrap">
             {/* Plain HTML, no rating schema — Phase 7. A link to the reviews on the

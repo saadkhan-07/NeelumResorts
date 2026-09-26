@@ -3,25 +3,20 @@
 import { useCallback, useEffect, useRef, useState } from "react";
 import { getImageProps } from "next/image";
 import { preload } from "react-dom";
-import { portraitUrl } from "@/lib/cloudinary";
 import type { MediaRow } from "@/lib/queries";
-
-/**
- * `mobileSrc` is an optional Cloudinary public ID of a portrait photo to use on
- * phones instead of the automatic 9:16 crop. Nothing sets it yet.
- */
-type HeroSlide = MediaRow & { mobileSrc?: string | null };
 
 const MOBILE = "(max-width: 900px)";
 const DESKTOP = "(min-width: 901px)";
-const MOBILE_WIDTHS = [640, 828, 1080, 1242];
+/** A 1x1 transparent GIF. See HeroPicture. */
+const BLANK = "data:image/gif;base64,R0lGODlhAQABAIAAAAAAAP///yH5BAEAAAAALAAAAAABAAEAAAIBRAA7";
 
 /**
- * Art direction: phones get a portrait crop sized for the tall mobile hero,
- * desktops get the same landscape URLs as before. The <img> carries the desktop
- * srcset, so it is also what any browser without a matching <source> shows.
+ * Phones do not see the slider — HeroMobileVideo takes the hero there and the
+ * stylesheet hides `.hero__slides`. A hidden <img> is still downloaded, so the
+ * mobile <source> points at a blank GIF and the photographs are only preloaded
+ * for desktops.
  */
-function HeroPicture({ slide, first }: { slide: HeroSlide; first: boolean }) {
+function HeroPicture({ slide, first }: { slide: MediaRow; first: boolean }) {
   const { props: desktop } = getImageProps({
     src: slide.publicId,
     alt: slide.alt,
@@ -31,15 +26,8 @@ function HeroPicture({ slide, first }: { slide: HeroSlide; first: boolean }) {
     loading: first ? "eager" : undefined,
     style: { objectFit: "cover" },
   });
-  const mobileId = slide.mobileSrc || slide.publicId;
-  const mobileSrcSet = MOBILE_WIDTHS.map((w) => `${portraitUrl(mobileId, w)} ${w}w`).join(", ");
 
   if (first) {
-    // One preload per breakpoint. An unconditional preload of either set would
-    // make the other device download a photo it never shows.
-    preload(portraitUrl(mobileId, 828), {
-      as: "image", imageSrcSet: mobileSrcSet, imageSizes: "100vw", media: MOBILE, fetchPriority: "high",
-    });
     preload(desktop.src!, {
       as: "image", imageSrcSet: desktop.srcSet, imageSizes: "100vw", media: DESKTOP, fetchPriority: "high",
     });
@@ -47,7 +35,7 @@ function HeroPicture({ slide, first }: { slide: HeroSlide; first: boolean }) {
 
   return (
     <picture>
-      <source media={MOBILE} srcSet={mobileSrcSet} sizes="100vw" />
+      <source media={MOBILE} srcSet={BLANK} />
       <img {...desktop} alt={slide.alt} />
     </picture>
   );
@@ -62,6 +50,9 @@ function HeroPicture({ slide, first }: { slide: HeroSlide; first: boolean }) {
  * dots show two and the timer cycles two. With one, there is no timer and no
  * dots at all — a single still, not a slider pretending to be one.
  *
+ * On phones the slider is hidden behind the hero video, so the timer does not
+ * run there at all.
+ *
  * `prefers-reduced-motion` stops the auto-advance; the dots still work, so the
  * guest can still see every photograph on their own terms.
  *
@@ -70,7 +61,7 @@ function HeroPicture({ slide, first }: { slide: HeroSlide; first: boolean }) {
  * the hero — so it never changes under someone reading the headline or tabbing
  * to "Check availability" — and stops for good once a dot is chosen.
  */
-export function HeroSlider({ slides }: { slides: HeroSlide[] }) {
+export function HeroSlider({ slides }: { slides: MediaRow[] }) {
   const [index, setIndex] = useState(0);
   const [reduced, setReduced] = useState(false);
   const [mounted, setMounted] = useState(false);
@@ -78,6 +69,15 @@ export function HeroSlider({ slides }: { slides: HeroSlide[] }) {
   const slidesRef = useRef<HTMLDivElement>(null);
   const [paused, setPaused] = useState(false);
   const [chosen, setChosen] = useState(false);
+  const [mobile, setMobile] = useState(false);
+
+  useEffect(() => {
+    const mq = window.matchMedia(MOBILE);
+    const update = () => setMobile(mq.matches);
+    update();
+    mq.addEventListener("change", update);
+    return () => mq.removeEventListener("change", update);
+  }, []);
 
   useEffect(() => {
     const hero = slidesRef.current?.closest(".hero");
@@ -115,12 +115,12 @@ export function HeroSlider({ slides }: { slides: HeroSlide[] }) {
   );
 
   useEffect(() => {
-    if (reduced || paused || chosen || slides.length < 2) return;
+    if (mobile || reduced || paused || chosen || slides.length < 2) return;
     timer.current = setInterval(() => setIndex((i) => (i + 1) % slides.length), 6500);
     return () => {
       if (timer.current) clearInterval(timer.current);
     };
-  }, [reduced, paused, chosen, slides.length, index]);
+  }, [mobile, reduced, paused, chosen, slides.length, index]);
 
   if (slides.length === 0) return null;
 
