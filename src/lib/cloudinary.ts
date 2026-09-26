@@ -29,6 +29,15 @@ export function imageUrl(publicId: string, width: number) {
   return `${base("image")}/f_auto,q_auto,c_fill,w_${width}/${publicId}`;
 }
 
+/**
+ * A 9:16 portrait crop for the phone hero, where a landscape photo under
+ * `object-fit: cover` would show only its middle third, scaled up ~3x.
+ * `g_auto` keeps the subject in frame rather than the geometric centre.
+ */
+export function portraitUrl(publicId: string, width: number) {
+  return `${base("image")}/f_auto,q_auto:good,c_fill,g_auto,ar_9:16,w_${width}/${publicId}`;
+}
+
 /** Same, without the crop — for images whose own aspect ratio must survive. */
 export function imageUrlUncropped(publicId: string, width: number) {
   return `${base("image")}/f_auto,q_auto,w_${width}/${publicId}`;

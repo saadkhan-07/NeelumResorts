@@ -1,8 +1,57 @@
 "use client";
 
 import { useCallback, useEffect, useRef, useState } from "react";
-import { CldImage } from "./CldImage";
+import { getImageProps } from "next/image";
+import { preload } from "react-dom";
+import { portraitUrl } from "@/lib/cloudinary";
 import type { MediaRow } from "@/lib/queries";
+
+/**
+ * `mobileSrc` is an optional Cloudinary public ID of a portrait photo to use on
+ * phones instead of the automatic 9:16 crop. Nothing sets it yet.
+ */
+type HeroSlide = MediaRow & { mobileSrc?: string | null };
+
+const MOBILE = "(max-width: 900px)";
+const DESKTOP = "(min-width: 901px)";
+const MOBILE_WIDTHS = [640, 828, 1080, 1242];
+
+/**
+ * Art direction: phones get a portrait crop sized for the tall mobile hero,
+ * desktops get the same landscape URLs as before. The <img> carries the desktop
+ * srcset, so it is also what any browser without a matching <source> shows.
+ */
+function HeroPicture({ slide, first }: { slide: HeroSlide; first: boolean }) {
+  const { props: desktop } = getImageProps({
+    src: slide.publicId,
+    alt: slide.alt,
+    fill: true,
+    sizes: "100vw",
+    fetchPriority: first ? "high" : undefined,
+    loading: first ? "eager" : undefined,
+    style: { objectFit: "cover" },
+  });
+  const mobileId = slide.mobileSrc || slide.publicId;
+  const mobileSrcSet = MOBILE_WIDTHS.map((w) => `${portraitUrl(mobileId, w)} ${w}w`).join(", ");
+
+  if (first) {
+    // One preload per breakpoint. An unconditional preload of either set would
+    // make the other device download a photo it never shows.
+    preload(portraitUrl(mobileId, 828), {
+      as: "image", imageSrcSet: mobileSrcSet, imageSizes: "100vw", media: MOBILE, fetchPriority: "high",
+    });
+    preload(desktop.src!, {
+      as: "image", imageSrcSet: desktop.srcSet, imageSizes: "100vw", media: DESKTOP, fetchPriority: "high",
+    });
+  }
+
+  return (
+    <picture>
+      <source media={MOBILE} srcSet={mobileSrcSet} sizes="100vw" />
+      <img {...desktop} alt={slide.alt} />
+    </picture>
+  );
+}
 
 /**
  * The hero slider, ported from the reference script: a 6.5s timer, dots down the
@@ -21,7 +70,7 @@ import type { MediaRow } from "@/lib/queries";
  * the hero — so it never changes under someone reading the headline or tabbing
  * to "Check availability" — and stops for good once a dot is chosen.
  */
-export function HeroSlider({ slides }: { slides: MediaRow[] }) {
+export function HeroSlider({ slides }: { slides: HeroSlide[] }) {
   const [index, setIndex] = useState(0);
   const [reduced, setReduced] = useState(false);
   const [mounted, setMounted] = useState(false);
@@ -85,7 +134,7 @@ export function HeroSlider({ slides }: { slides: MediaRow[] }) {
             key={slide.id}
             className={n === index ? "hero__slide is-active" : "hero__slide"}
           >
-            <CldImage media={slide} priority={n === 0} sizes="100vw" />
+            <HeroPicture slide={slide} first={n === 0} />
           </div>
         ))}
       </div>
